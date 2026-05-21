@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mira — Hormonal & IR Meal Planner</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 16px; -webkit-font-smoothing: antialiased; }
+    body { background: oklch(0.945 0.022 88); color: oklch(0.28 0.040 145); }
+    input, select, button, textarea { font-family: inherit; }
+    input[type="range"] { cursor: pointer; }
+    :focus-visible { outline: 2px solid oklch(0.62 0.11 35); outline-offset: 2px; }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: oklch(0.78 0.025 90); border-radius: 3px; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <!-- Load order matters: data → components → features → app -->
+  <script type="text/babel" src="src/data.jsx"></script>
+  <script type="text/babel" src="src/components.jsx"></script>
+  <script type="text/babel" src="src/tweaks-panel.jsx"></script>
+  <script type="text/babel" src="src/onboarding.jsx"></script>
+  <script type="text/babel" src="src/dashboard.jsx"></script>
+  <script type="text/babel" src="src/recipes.jsx"></script>
+  <script type="text/babel" src="src/screens.jsx"></script>
+  <script type="text/babel" src="src/app.jsx"></script>
+</body>
+</html>
