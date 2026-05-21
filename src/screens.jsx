@@ -84,15 +84,29 @@ function CycleCalendar({ profile, go, setProfile }) {
                 )}
               </div>
 
-              {/* Headline + body */}
+              {/* Headline + body + gut + ayurvedic */}
               <div>
                 <window.Eyebrow color={p.color}>{p.name} phase</window.Eyebrow>
                 <h3 style={{ fontFamily: 'Instrument Serif, serif', fontSize: 40, lineHeight: 1.1, color: 'oklch(0.28 0.040 145)', margin: '12px 0 18px', fontWeight: 400 }}>
                   <em>{p.headline}</em>
                 </h3>
-                <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 15, lineHeight: 1.6, color: 'oklch(0.42 0.035 135)', margin: 0 }}>
+                <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 15, lineHeight: 1.6, color: 'oklch(0.42 0.035 135)', margin: '0 0 24px' }}>
                   {p.body}
                 </p>
+                {/* Gut focus */}
+                <div style={{ padding: '18px 20px', borderRadius: 12, background: p.soft, border: `1px solid ${p.color}25`, marginBottom: 14 }}>
+                  <window.Eyebrow color={p.color}>Gut & microbiome</window.Eyebrow>
+                  <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 13.5, lineHeight: 1.6, color: 'oklch(0.38 0.035 140)', margin: '8px 0 0' }}>
+                    {p.gutFocus}
+                  </p>
+                </div>
+                {/* Ayurvedic focus */}
+                <div style={{ padding: '18px 20px', borderRadius: 12, background: 'oklch(0.28 0.040 145)' }}>
+                  <window.Eyebrow color="oklch(0.76 0.08 88)">Ayurvedic lens · {p.dosha}</window.Eyebrow>
+                  <p style={{ fontFamily: 'Instrument Serif, serif', fontSize: 15, lineHeight: 1.6, color: 'oklch(0.86 0.025 95)', margin: '8px 0 0', fontStyle: 'italic' }}>
+                    {p.ayurvedicFocus}
+                  </p>
+                </div>
               </div>
 
               {/* Add / Avoid / Seed */}
@@ -128,6 +142,7 @@ function CycleCalendar({ profile, go, setProfile }) {
 function ShoppingList({ profile }) {
   const phase         = window.phaseForDay(profile.day, profile.length);
   const plan          = window.PLAN_BY_PHASE[phase.id];
+  const plantsToday   = window.countPlantsToday(plan);
   const defaultMarket = profile.markets[0] || 'REWE';
   const defaultMarketObj = window.SUPERMARKETS.find(s => s.id === defaultMarket) || window.SUPERMARKETS[0];
 
@@ -242,17 +257,37 @@ function ShoppingList({ profile }) {
         ))}
       </div>
 
-      {/* Seed cycling footer */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 72, paddingTop: 28, borderTop: '1px solid oklch(0.86 0.025 95)' }}>
+      {/* Footer: seed cycling + 30-plants goal */}
+      <div style={{ marginTop: 72, paddingTop: 28, borderTop: '1px solid oklch(0.86 0.025 95)', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 40 }}>
         <div>
           <window.Eyebrow>Don't forget · seed cycling</window.Eyebrow>
           <div style={{ fontFamily: 'Instrument Serif, serif', fontSize: 28, color: 'oklch(0.28 0.040 145)', marginTop: 6, fontStyle: 'italic' }}>
             {phase.seed}
           </div>
+          <div style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 12.5, color: 'oklch(0.54 0.035 135)', marginTop: 6 }}>
+            Drogerie bulk bins · dm or Rossmann
+          </div>
         </div>
-        <span style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 13, color: 'oklch(0.54 0.035 135)' }}>
-          Drogerie bulk bins · dm or Rossmann
-        </span>
+        <div style={{ padding: '22px 24px', borderRadius: 16, background: phase.soft, border: `1px solid ${phase.color}25` }}>
+          <window.Eyebrow color={phase.color}>Plant diversity goal · 30/week</window.Eyebrow>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginTop: 10 }}>
+            <span style={{ fontFamily: 'Instrument Serif, serif', fontSize: 42, color: 'oklch(0.58 0.09 140)', lineHeight: 1 }}>{plantsToday}</span>
+            <span style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 13, color: 'oklch(0.46 0.035 135)' }}>
+              plants today · {Math.round((plantsToday / 30) * 100)}% of weekly goal
+            </span>
+          </div>
+          <div style={{ marginTop: 10, height: 5, borderRadius: 999, background: 'oklch(0.86 0.025 95)', overflow: 'hidden' }}>
+            <div style={{ height: '100%', borderRadius: 999, background: 'oklch(0.58 0.09 140)', width: `${Math.min(Math.round((plantsToday / 30) * 100), 100)}%` }} />
+          </div>
+          <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 9.5, color: 'oklch(0.50 0.035 135)', marginTop: 6, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+            {plantsToday >= 4
+              ? 'Estrobolome well-fed · Keep adding variety all week'
+              : `Add ${4 - plantsToday} more plant foods today`}
+          </div>
+          <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 12, lineHeight: 1.55, color: 'oklch(0.46 0.035 135)', margin: '10px 0 0' }}>
+            Microbiome diversity is the foundation of hormonal health. The Estrobolome — gut bacteria that metabolise estrogen — thrives on variety. Aim for 30 distinct plant foods every week.
+          </p>
+        </div>
       </div>
     </div>
   );

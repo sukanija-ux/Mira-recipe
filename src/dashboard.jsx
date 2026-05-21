@@ -26,8 +26,12 @@ function Dashboard({ profile, go, openRecipe }) {
       ];
 
   const nextMealReady = hoursSince >= 4;
+  const mmcActive     = hoursSince >= 4;
   const stage = window.lifeStageFor(profile.age);
   const stageNote = stage.id !== 'reproductive' ? ` · ${stage.label} adjustments applied.` : '';
+
+  const plantsToday   = window.countPlantsToday(plan);
+  const weeklyPct     = Math.round((plantsToday / 30) * 100);
 
   const tones = ['clay', 'sage', 'honey', 'plum'];
 
@@ -54,15 +58,33 @@ function Dashboard({ profile, go, openRecipe }) {
           <Stat label="Daily protein" value={`${proteinTarget}g`} sub={`${perMeal}g per meal · ${profile.meals}× a day`} />
           <Stat
             label="Last meal"
-            value={`${hoursSince.toFixed(1)}h ago`}
-            sub={nextMealReady ? 'Ready when you are' : `${(4 - hoursSince).toFixed(1)}h until next`}
-            accent={nextMealReady ? 'oklch(0.58 0.08 138)' : phase.color}
+            value={`${hoursSince.toFixed(1)}h`}
+            sub={mmcActive
+              ? `MMC gut-clearing window active · ${hoursSince.toFixed(1)}h fasted`
+              : `${(4 - hoursSince).toFixed(1)}h until MMC window opens`}
+            accent={mmcActive ? 'oklch(0.58 0.08 138)' : phase.color}
           />
           <Stat
             label="Carb permission"
             value={phase.id === 'follicular' ? 'High' : phase.id === 'luteal' ? 'Slow' : 'Moderate'}
             sub="Breakfast & lunch only"
           />
+        </div>
+      </section>
+
+      {/* Gut & Ayurvedic focus for today's phase */}
+      <section style={{ marginBottom: 64, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
+        <div style={{ padding: 28, borderRadius: 18, background: phase.soft, border: `1px solid ${phase.color}30` }}>
+          <window.Eyebrow color={phase.color}>Gut focus · {phase.name}</window.Eyebrow>
+          <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 14.5, lineHeight: 1.65, color: 'oklch(0.34 0.035 140)', margin: '12px 0 0' }}>
+            {phase.gutFocus}
+          </p>
+        </div>
+        <div style={{ padding: 28, borderRadius: 18, background: 'oklch(0.28 0.040 145)', color: 'oklch(0.93 0.022 90)' }}>
+          <window.Eyebrow color="oklch(0.76 0.08 88)">Ayurvedic lens · {phase.dosha}</window.Eyebrow>
+          <p style={{ fontFamily: 'Instrument Serif, serif', fontSize: 16, lineHeight: 1.55, color: 'oklch(0.88 0.025 95)', margin: '12px 0 0', fontStyle: 'italic' }}>
+            {phase.ayurvedicFocus}
+          </p>
         </div>
       </section>
 
@@ -80,7 +102,7 @@ function Dashboard({ profile, go, openRecipe }) {
         <div style={{ display: 'grid', gridTemplateColumns: `repeat(${mealsList.length}, 1fr)`, gap: 24 }}>
           {mealsList.map((m, i) => (
             <article key={m.key} onClick={() => openRecipe(m.r.id)} style={{ cursor: 'pointer', display: 'flex', flexDirection: 'column', gap: 16 }}>
-              <window.ImagePlot label={m.r.title} tone={tones[i % tones.length]} aspect="4/5" round={18} />
+              <window.ImagePlot src={m.r.imageUrl} label={m.r.title} tone={tones[i % tones.length]} aspect="4/5" round={18} />
               <div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
                   <window.Eyebrow>{m.label} · {m.time}</window.Eyebrow>
@@ -97,17 +119,32 @@ function Dashboard({ profile, go, openRecipe }) {
         </div>
       </section>
 
-      {/* Seed cycling footer */}
-      <section style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: 28, borderTop: '1px solid oklch(0.86 0.025 95)' }}>
+      {/* Seed cycling + 30-plants footer */}
+      <section style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 40, paddingTop: 28, borderTop: '1px solid oklch(0.86 0.025 95)', alignItems: 'center' }}>
         <div>
           <window.Eyebrow>Today's seed cycling</window.Eyebrow>
           <div style={{ fontFamily: 'Instrument Serif, serif', fontSize: 28, color: 'oklch(0.28 0.040 145)', marginTop: 6, fontStyle: 'italic' }}>
             {phase.seed}
           </div>
         </div>
-        <button onClick={() => go('shop')} style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'DM Sans, sans-serif', fontSize: 14, color: 'oklch(0.50 0.035 135)' }}>
-          Shopping list →
-        </button>
+        <div>
+          <window.Eyebrow>Plant diversity · 30/week goal</window.Eyebrow>
+          <div style={{ marginTop: 10, display: 'flex', alignItems: 'baseline', gap: 10 }}>
+            <span style={{ fontFamily: 'Instrument Serif, serif', fontSize: 42, color: 'oklch(0.58 0.09 140)', lineHeight: 1 }}>{plantsToday}</span>
+            <span style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 13.5, color: 'oklch(0.50 0.035 135)' }}>plants today · {weeklyPct}% of weekly goal</span>
+          </div>
+          <div style={{ marginTop: 8, height: 4, borderRadius: 999, background: 'oklch(0.88 0.025 95)', overflow: 'hidden' }}>
+            <div style={{ height: '100%', borderRadius: 999, background: 'oklch(0.58 0.09 140)', width: `${Math.min(weeklyPct, 100)}%`, transition: 'width 0.4s ease' }} />
+          </div>
+          <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 9.5, color: 'oklch(0.54 0.035 135)', marginTop: 5, letterSpacing: '0.08em' }}>
+            {plantsToday >= 4 ? 'GREAT DAY · 4+ PLANTS THRESHOLD MET' : `ADD ${4 - plantsToday} MORE PLANTS TODAY`}
+          </div>
+        </div>
+        <div style={{ textAlign: 'right' }}>
+          <button onClick={() => go('shop')} style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'DM Sans, sans-serif', fontSize: 14, color: 'oklch(0.50 0.035 135)' }}>
+            Shopping list →
+          </button>
+        </div>
       </section>
     </div>
   );

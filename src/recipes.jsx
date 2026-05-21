@@ -44,7 +44,7 @@ function RecipeBrowse({ profile, openRecipe }) {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 36, rowGap: 56 }}>
         {list.map((r, i) => (
           <article key={r.id} onClick={() => openRecipe(r.id)} style={{ cursor: 'pointer' }}>
-            <window.ImagePlot label={r.title} tone={tones[i % tones.length]} aspect="4/5" round={18} />
+            <window.ImagePlot src={r.imageUrl} label={r.title} tone={tones[i % tones.length]} aspect="4/5" round={18} />
             <div style={{ marginTop: 18 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
                 <window.Eyebrow>{r.source}</window.Eyebrow>
@@ -55,13 +55,23 @@ function RecipeBrowse({ profile, openRecipe }) {
               <h3 style={{ fontFamily: 'Instrument Serif, serif', fontSize: 26, lineHeight: 1.15, color: 'oklch(0.28 0.040 145)', margin: '6px 0 10px', fontWeight: 400 }}>
                 {r.title}
               </h3>
+              {/* Tag badges */}
+              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 10 }}>
+                {r.tags.filter(t => window.CARD_TAGS.includes(t)).slice(0, 3).map(tag => {
+                  const ts = window.tagStyle(tag);
+                  return (
+                    <span key={tag} style={{
+                      display: 'inline-flex', alignItems: 'center',
+                      background: ts.bg, color: ts.fg, border: `1px solid ${ts.bd}`,
+                      padding: '4px 8px', borderRadius: 999,
+                      fontFamily: 'JetBrains Mono, monospace', fontSize: 9.5,
+                      letterSpacing: '0.08em', textTransform: 'uppercase', whiteSpace: 'nowrap',
+                    }}>{tag}</span>
+                  );
+                })}
+              </div>
               <div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
                 {r.phases.map(p => <window.PhaseChip key={p} phaseId={p} />)}
-                {r.meal === 'dinner' && (
-                  <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 10, letterSpacing: '0.12em', color: 'oklch(0.52 0.035 135)' }}>
-                    · DINNER · 0 STARCH
-                  </span>
-                )}
               </div>
             </div>
           </article>
@@ -108,7 +118,7 @@ function RecipeDetail({ id, profile, go, openRecipe }) {
       {/* Hero */}
       <div style={{ maxWidth: 1320, margin: '0 auto', padding: '20px 32px 0' }}>
         <div style={{ position: 'relative', borderRadius: 24, overflow: 'hidden' }}>
-          <window.ImagePlot label={`${r.title} — ${r.source}`} tone="clay" aspect="21/9" round={24} />
+          <window.ImagePlot src={r.imageUrl} label={`${r.title} — ${r.source}`} tone="clay" aspect="21/9" round={24} />
           {/* Video pill */}
           <button style={{
             position: 'absolute', bottom: 24, left: 24,
@@ -142,6 +152,21 @@ function RecipeDetail({ id, profile, go, openRecipe }) {
               <span><em style={{ color: 'oklch(0.28 0.040 145)' }}>{r.protein}g</em> protein</span>
               <span><em style={{ color: 'oklch(0.28 0.040 145)' }}>{r.carbs}g</em> carbs</span>
               <span><em style={{ color: 'oklch(0.28 0.040 145)' }}>{r.fat}g</em> fat</span>
+            </div>
+            {/* Tag badges */}
+            <div style={{ display: 'flex', gap: 7, flexWrap: 'wrap', marginTop: 20 }}>
+              {r.tags.map(tag => {
+                const ts = window.tagStyle(tag);
+                return (
+                  <span key={tag} style={{
+                    display: 'inline-flex', alignItems: 'center',
+                    background: ts.bg, color: ts.fg, border: `1px solid ${ts.bd}`,
+                    padding: '5px 10px', borderRadius: 999,
+                    fontFamily: 'JetBrains Mono, monospace', fontSize: 10,
+                    letterSpacing: '0.08em', textTransform: 'uppercase', whiteSpace: 'nowrap',
+                  }}>{tag}</span>
+                );
+              })}
             </div>
           </div>
           <div style={{ display: 'flex', gap: 10, flexShrink: 0 }}>
@@ -254,7 +279,7 @@ function RecipeDetail({ id, profile, go, openRecipe }) {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20 }}>
             {window.RECIPES.filter(x => x.id !== r.id).slice(0, 3).map((x, i) => (
               <window.Card key={x.id} padding={0} hover onClick={() => openRecipe(x.id)} style={{ overflow: 'hidden' }}>
-                <window.ImagePlot label={x.title} tone={['sage', 'honey', 'plum'][i % 3]} aspect="4/3" round={0} />
+                <window.ImagePlot src={x.imageUrl} label={x.title} tone={['sage', 'honey', 'plum'][i % 3]} aspect="4/3" round={0} />
                 <div style={{ padding: 18 }}>
                   <window.Eyebrow>{x.source} · {x.minutes} min</window.Eyebrow>
                   <h4 style={{ fontFamily: 'Instrument Serif, serif', fontSize: 20, lineHeight: 1.15, color: 'oklch(0.28 0.040 145)', margin: '6px 0 0', fontWeight: 400 }}>{x.title}</h4>

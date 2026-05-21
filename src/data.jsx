@@ -10,8 +10,10 @@ const PHASES = [
     soft: 'oklch(0.93 0.035 40)',
     headline: 'Warm, ground, replenish.',
     body: 'Estrogen and progesterone are at baseline. The body is shedding tissue and losing iron. Digestion (Agni) runs low — favor warm, cooked, deeply nourishing meals over raw or cold.',
-    needs: ['Iron', 'Zinc', 'Warming spices', 'Bone broth'],
-    avoid: ['Raw salads', 'Cold drinks', 'Dry crackers'],
+    gutFocus: 'Gut lining is most vulnerable. Prioritise bone broths, long-simmered legumes, and collagen-rich foods rich in L-glutamine to repair the intestinal mucosa. Avoid raw salads and cold drinks — they suppress Agni and worsen cramping. Slow gut motility can alternate with urgency; warm, easy-to-digest meals reduce this variability.',
+    ayurvedicFocus: 'Vata dominates — the wind/space element governs movement and the nervous system. Ground it with heavy, unctuous, warm foods. Ghee is medicine. Mung dal is the ideal reset meal. Avoid all dry, rough, cold, or raw textures. Spice gently with cumin, ginger, and black pepper to rekindle digestive fire.',
+    needs: ['Iron', 'Zinc', 'L-Glutamine', 'Warming spices', 'Bone broth'],
+    avoid: ['Raw salads', 'Cold drinks', 'Dry crackers', 'Cruciferous raw veg'],
     carbState: 'Moderate, clean, comforting carbs allowed at breakfast & lunch.',
     seed: '1 tbsp ground flax + 1 tbsp pumpkin',
   },
@@ -24,8 +26,10 @@ const PHASES = [
     soft: 'oklch(0.93 0.030 140)',
     headline: 'Light, vibrant, fermented.',
     body: 'Estrogen rises to build the uterine lining. Insulin sensitivity is at its monthly peak — the body handles clean complex carbs exceptionally well. Feed the estrobolome.',
-    needs: ['Fermented foods', 'Cruciferous veg', 'Sprouts', 'Vibrant color'],
-    avoid: ['Heavy, oily foods', 'Excess dairy'],
+    gutFocus: 'The Estrobolome — the subset of gut bacteria that metabolise and eliminate used estrogen — is the focus. Feed it with diverse plant fibers and fermented foods (sauerkraut, kefir, kimchi). Cruciferous vegetables (broccoli, sprouts, rocket) support liver Phase II detoxification of estrogen. Target 30+ distinct plant foods this week to maximise microbiome diversity.',
+    ayurvedicFocus: 'Kapha dominates — heavy, stable, moist earth energy. Counter it with light, vibrant, slightly bitter, and lightly spiced foods. Use warming ginger and cinnamon to keep digestion crisp without overheating. Spring-like foods mirror this phase: sprouts, micro-greens, light grains.',
+    needs: ['Fermented foods', 'Cruciferous veg', 'Sprouts', 'Vibrant plant diversity'],
+    avoid: ['Heavy, oily foods', 'Excess dairy', 'Refined grains'],
     carbState: 'Highest tolerance for vibrant, clean complex carbs.',
     seed: '1 tbsp ground flax + 1 tbsp pumpkin',
   },
@@ -38,8 +42,10 @@ const PHASES = [
     soft: 'oklch(0.94 0.040 88)',
     headline: 'Cool, antioxidant, bright.',
     body: 'Estrogen peaks and drops; LH triggers ovulation. Heat can accumulate — balance with cooling herbs (cilantro, mint, fennel) and high-antioxidant produce.',
-    needs: ['Vitamin E', 'Antioxidants', 'Cooling herbs', 'Bitter greens'],
-    avoid: ['Overly pungent, spicy foods', 'Excess heat'],
+    gutFocus: 'High antioxidant density clears systemic inflammation that peaks at ovulation. Prioritise soluble and insoluble fibers to bind to deactivated hormones in the bowel and prevent them from being reabsorbed (enterohepatic recirculation). Flaxseed, psyllium, and resistant starches are excellent here.',
+    ayurvedicFocus: 'Pitta begins to rise — the fire element governs transformation. Excess heat can manifest as inflammation, skin breakouts, or irritability. Cool the system with cilantro, mint, fennel, cucumber, and lime. Avoid excessively spicy, sour, or pungent foods. Bitter greens (rocket, dandelion) support liver bile flow.',
+    needs: ['Vitamin E', 'Antioxidants', 'Cooling herbs', 'Bitter greens', 'Soluble fiber'],
+    avoid: ['Overly spicy foods', 'Excess heat', 'Alcohol'],
     carbState: 'Moderate carbs at breakfast & lunch.',
     seed: '1 tbsp sesame + 1 tbsp sunflower',
   },
@@ -52,8 +58,10 @@ const PHASES = [
     soft: 'oklch(0.93 0.025 230)',
     headline: 'Slow, magnesium, steady.',
     body: 'Progesterone peaks. Critical IR factor: progesterone increases insulin resistance and provokes carb cravings. Do not aggressively restrict — provide slow-burning, high-fiber, low-glycemic carbs to steady serotonin without spiking insulin.',
-    needs: ['Magnesium', 'Vitamin B6', 'Cinnamon', 'Turmeric', 'Slow carbs'],
-    avoid: ['Sharp restriction', 'Refined sugar', 'Late-night carbs'],
+    gutFocus: 'Progesterone slows smooth muscle contraction, directly slowing intestinal motility — bloating and constipation are common. Counter this with high-magnesium foods (spinach, pumpkin seeds, raw cacao), soluble fiber (chia, flax, psyllium), and Vitamin B6-rich foods. Carminative spices (fennel, cardamom, ginger) relieve gas and bloating mechanically.',
+    ayurvedicFocus: 'Pitta and Vata both rise — fire creates inflammation and wind creates anxiety and bloating. Warm, grounding, gently spiced foods are medicine: cinnamon for blood sugar, turmeric for inflammation, fenugreek for insulin sensitivity, cardamom and ginger for bloating. Slow-cooked squash, legumes, and warm grain dishes anchor both doshas.',
+    needs: ['Magnesium', 'Vitamin B6', 'Cinnamon', 'Turmeric', 'Soluble fiber', 'Slow carbs'],
+    avoid: ['Refined sugar', 'Late-night carbs', 'Aggressive restriction', 'Raw cold foods'],
     carbState: 'Complex, high-fiber, slow-burning carbs at breakfast & lunch (squash, quinoa, legumes).',
     seed: '1 tbsp sesame + 1 tbsp sunflower',
   },
@@ -68,12 +76,15 @@ function phaseForDay(day, length = 28) {
   return PHASES[3];
 }
 
+// Plant food count = distinct whole plant ingredients per recipe (for 30-plant/week goal)
 const RECIPES = [
   {
     id: 'r-warming-mung-dal',
     title: 'Golden Mung Dal with Charred Greens',
     source: 'Sallys Welt',
     author: 'Sally Özcan',
+    sourceUrl: 'https://sallys-blog.de/rezepte/indisches-linsen-curry-mit-warmem-tomaten-salat',
+    imageUrl: 'https://source.unsplash.com/featured/800x600/?mung,dal,lentil,turmeric,soup',
     minutes: 35,
     servings: 2,
     protein: 32,
@@ -81,7 +92,8 @@ const RECIPES = [
     fat: 18,
     meal: 'lunch',
     phases: ['menstrual', 'luteal'],
-    tags: ['Ayurvedic-spiced', 'Warming', 'Perfect for Menstrual'],
+    plantCount: 6,
+    tags: ['Ayurvedic-spiced', 'Gut-healing', 'Warming', 'Gluten-free'],
     ingredients: [
       { item: 'Split yellow mung dal', amount: '150 g', brand: { REWE: 'REWE Bio Mung Dal', Edeka: 'Edeka Bio Hülsenfrüchte', Alnatura: 'Alnatura Mungbohnen' } },
       { item: 'Ghee', amount: '2 tbsp', brand: { REWE: 'REWE Bio Ghee', Edeka: 'GUT&GÜNSTIG Butterschmalz', Alnatura: 'Alnatura Ghee' } },
@@ -99,13 +111,15 @@ const RECIPES = [
       'Strip the kale, tear into large pieces, and char in a dry cast-iron pan until edges blister.',
       'Spoon dal into warm bowls. Top with kale, cilantro, a final drizzle of ghee, and a crack of black pepper.',
     ],
-    notes: 'Stir 1 tbsp ground flax + 1 tbsp pumpkin seeds in at the end during Menstrual or Follicular phase.',
+    notes: 'Stir 1 tbsp ground flax + 1 tbsp pumpkin seeds in at the end during Menstrual or Follicular phase. Mung dal is the single most Ayurvedic gut-reset food — deeply nourishing, easy to digest, and anti-inflammatory.',
   },
   {
     id: 'r-roasted-squash',
     title: 'Roasted Kabocha, Tahini, Sumac',
     source: 'Kitchen Stories',
-    author: 'Hanna Sandberg',
+    author: 'Hanna Reder',
+    sourceUrl: 'https://www.kitchenstories.com/en/recipes/mashed-kabocha-squash-a046',
+    imageUrl: 'https://source.unsplash.com/featured/800x600/?roasted,kabocha,squash,tahini',
     minutes: 45,
     servings: 2,
     protein: 28,
@@ -113,7 +127,8 @@ const RECIPES = [
     fat: 22,
     meal: 'lunch',
     phases: ['luteal'],
-    tags: ['Seasonal', 'Magnesium-rich', 'Perfect for Luteal'],
+    plantCount: 5,
+    tags: ['Seasonal', 'Magnesium-rich', 'Gut-healing', 'Vegan', 'Gluten-free'],
     ingredients: [
       { item: 'Kabocha squash', amount: '½', brand: { REWE: 'REWE Bio Hokkaido', Edeka: 'Edeka Bio Kürbis', Alnatura: 'Alnatura Hokkaido-Kürbis' } },
       { item: 'Extra virgin olive oil', amount: '3 tbsp', brand: { REWE: 'REWE Bio Olivenöl Nativ Extra', Edeka: 'BIO WERTKOST Olivenöl', Alnatura: 'Alnatura Olivenöl Nativ Extra' } },
@@ -129,12 +144,15 @@ const RECIPES = [
       'Warm chickpeas in a dry skillet with sumac and a little olive oil, 3 minutes.',
       'Plate the squash, spoon tahini, scatter chickpeas, finish with fermented cabbage.',
     ],
+    notes: 'The lacto-fermented cabbage adds a live probiotic hit that directly feeds the Estrobolome. Tahini is sesame in whole form — your luteal seed cycling built into the recipe.',
   },
   {
     id: 'r-folli-bowl',
     title: 'Sprouted Lentil & Beet Probiotic Bowl',
     source: 'REWE Rezepte',
     author: 'REWE Küche',
+    sourceUrl: 'https://www.rewe.de/rezepte/rote-linsen-salat-mit-roter-beete/',
+    imageUrl: 'https://source.unsplash.com/featured/800x600/?lentil,beet,grain,bowl,healthy',
     minutes: 25,
     servings: 2,
     protein: 30,
@@ -142,7 +160,8 @@ const RECIPES = [
     fat: 14,
     meal: 'lunch',
     phases: ['follicular'],
-    tags: ['Estrobolome', 'Fermented', 'Perfect for Follicular'],
+    plantCount: 7,
+    tags: ['Estrobolome', 'Probiotic', 'Gut-healing', 'Fermented', 'Gluten-free', 'Vegetarian'],
     ingredients: [
       { item: 'Sprouted green lentils', amount: '200 g', brand: { REWE: 'REWE Bio Linsen', Edeka: 'Edeka Bio Berglinsen', Alnatura: 'Alnatura Berglinsen' } },
       { item: 'Roasted beets', amount: '2 medium', brand: { REWE: 'REWE Bio Rote Bete', Edeka: 'Edeka Bio Rote Bete', Alnatura: 'Alnatura Rote Bete' } },
@@ -156,12 +175,15 @@ const RECIPES = [
       'Whisk kefir with lemon, mustard, dill, salt, pepper.',
       'Toss lentils with half the dressing; plate with beets, more dressing, toasted pumpkin seeds.',
     ],
+    notes: 'Kefir introduces live Lactobacillus directly to the gut. Beets contain betaine, which supports liver methylation and estrogen detox. The pumpkin seeds deliver your follicular-phase flax/pumpkin seed cycling dose.',
   },
   {
     id: 'r-dinner-cod',
     title: 'Pan-Seared Cod, Brown Butter Greens',
     source: 'Kitchen Stories',
     author: 'Ruby Goss',
+    sourceUrl: 'https://www.kitchenstories.com/en/recipes/5-ingredient-one-pan-tomato-braised-cod',
+    imageUrl: 'https://source.unsplash.com/featured/800x600/?pan,seared,cod,fish,asparagus',
     minutes: 20,
     servings: 2,
     protein: 36,
@@ -169,7 +191,8 @@ const RECIPES = [
     fat: 26,
     meal: 'dinner',
     phases: ['menstrual', 'follicular', 'ovulatory', 'luteal'],
-    tags: ['Dinner-safe', 'Zero starch', 'Low FODMAP'],
+    plantCount: 4,
+    tags: ['Dinner-safe', 'Zero starch', 'Low-FODMAP', 'Gluten-free', 'Dairy-free option'],
     ingredients: [
       { item: 'Cod fillet', amount: '300 g', brand: { REWE: 'REWE Beste Wahl Kabeljau', Edeka: 'EDEKA Kabeljaufilet', Alnatura: 'followfish Kabeljau' } },
       { item: 'Cultured butter', amount: '40 g', brand: { REWE: 'REWE Bio Süßrahmbutter', Edeka: 'Kerrygold Butter', Alnatura: 'Alnatura Bio Butter' } },
@@ -185,12 +208,15 @@ const RECIPES = [
       'In the same pan, blister asparagus 3 minutes, then wilt spinach off the heat.',
       'Plate cod over greens. Spoon brown butter, capers, a wide squeeze of lemon.',
     ],
+    notes: 'The prebiotic fiber in asparagus feeds Bifidobacterium overnight — a clean insulin-flat dinner that does gut-repair work while you sleep. Zero starch keeps overnight insulin entirely flat.',
   },
   {
     id: 'r-ovu-salmon',
     title: 'Slow-Roast Salmon, Cucumber, Fennel',
     source: 'Sallys Welt',
     author: 'Sally Özcan',
+    sourceUrl: 'https://sallys-blog.de/rezepte/green-secret-sauce',
+    imageUrl: 'https://source.unsplash.com/featured/800x600/?slow,roasted,salmon,fennel,cucumber',
     minutes: 30,
     servings: 2,
     protein: 34,
@@ -198,7 +224,8 @@ const RECIPES = [
     fat: 24,
     meal: 'dinner',
     phases: ['ovulatory'],
-    tags: ['Antioxidant', 'Cooling', 'Perfect for Ovulatory'],
+    plantCount: 5,
+    tags: ['Antioxidant', 'Cooling', 'Gluten-free', 'Zero starch', 'Low-FODMAP'],
     ingredients: [
       { item: 'Wild salmon', amount: '300 g', brand: { REWE: 'REWE Bio Lachsfilet', Edeka: 'followfish Lachs', Alnatura: 'followfish Lachsfilet' } },
       { item: 'Cucumber', amount: '1', brand: { REWE: 'REWE Bio Gurke', Edeka: 'Edeka Bio Salatgurke', Alnatura: 'Alnatura Salatgurke' } },
@@ -212,12 +239,15 @@ const RECIPES = [
       'Stir yogurt with mint, lemon juice, a pinch of cumin.',
       'Plate the slow salmon; pile shaved salad alongside; spoon yogurt across the warm fish.',
     ],
+    notes: 'Fennel is the ultimate carminative — it reduces bloating and spasm by relaxing smooth intestinal muscle. Mint and cucumber are classic Pitta-cooling herbs. Omega-3s in wild salmon reduce the LH-surge inflammation.',
   },
   {
     id: 'r-breakfast-eggs',
     title: 'Soft-Folded Eggs, Avocado, Sourdough Crumb',
     source: 'Kitchen Stories',
-    author: 'Ola Olsson',
+    author: 'Xueci Cheng',
+    sourceUrl: 'https://www.kitchenstories.com/en/recipes/tiktoks-viral-pesto-eggs-2-ways-en',
+    imageUrl: 'https://source.unsplash.com/featured/800x600/?scrambled,eggs,avocado,sourdough,toast',
     minutes: 12,
     servings: 1,
     protein: 26,
@@ -225,7 +255,8 @@ const RECIPES = [
     fat: 28,
     meal: 'breakfast',
     phases: ['menstrual', 'follicular', 'ovulatory', 'luteal'],
-    tags: ['Quick', 'Protein-forward', 'Glucose-blunted'],
+    plantCount: 3,
+    tags: ['Quick', 'Protein-forward', 'Glucose-blunted', 'Vegetarian'],
     ingredients: [
       { item: 'Pasture eggs', amount: '3', brand: { REWE: 'REWE Bio Eier Freiland', Edeka: 'EDEKA Bio Eier', Alnatura: 'Alnatura Bio Eier' } },
       { item: 'Avocado', amount: '½', brand: { REWE: 'REWE Bio Avocado', Edeka: 'Edeka Bio Avocado', Alnatura: 'Alnatura Avocado' } },
@@ -239,6 +270,7 @@ const RECIPES = [
       'Pour the eggs in; pull them slowly with a silicone spatula. Take them off while still wet.',
       'Slide onto a plate, fan avocado, scatter sourdough crumb and chili.',
     ],
+    notes: 'Fat and protein eaten first blunts the glucose curve of any carb that follows. The avocado provides prebiotic fiber and potassium. Sourdough fermentation pre-digests some of the gluten and phytic acid.',
   },
 ];
 
@@ -250,6 +282,18 @@ const PLAN_BY_PHASE = {
 };
 
 const recipeById = (id) => RECIPES.find((r) => r.id === id);
+
+// Count total distinct plant foods across today's recipes
+function countPlantsToday(plan) {
+  const plants = new Set();
+  Object.values(plan).forEach(rid => {
+    const r = recipeById(rid);
+    if (r) r.ingredients.filter(ing =>
+      !/cod|salmon|egg|butter|ghee|kefir|yogurt/i.test(ing.item)
+    ).forEach(ing => plants.add(ing.item));
+  });
+  return plants.size;
+}
 
 const DIETS = [
   { id: 'omnivore',      name: 'Flexible Omnivore',       desc: 'No animal protein restrictions.' },
@@ -366,10 +410,39 @@ function bestStoreFor(item, profileMarkets) {
   return profileMarkets[0];
 }
 
+// Tag display config — color per tag family
+const TAG_STYLES = {
+  'Gut-healing':       { bg: 'oklch(0.91 0.05 145)', fg: 'oklch(0.32 0.08 145)', bd: 'oklch(0.78 0.07 145)' },
+  'Ayurvedic-spiced':  { bg: 'oklch(0.93 0.04 55)',  fg: 'oklch(0.38 0.08 50)',  bd: 'oklch(0.78 0.08 50)' },
+  'Seasonal':          { bg: 'oklch(0.93 0.04 88)',  fg: 'oklch(0.38 0.08 80)',  bd: 'oklch(0.78 0.08 88)' },
+  'Probiotic':         { bg: 'oklch(0.91 0.05 145)', fg: 'oklch(0.32 0.08 145)', bd: 'oklch(0.78 0.07 145)' },
+  'Estrobolome':       { bg: 'oklch(0.91 0.05 145)', fg: 'oklch(0.32 0.08 145)', bd: 'oklch(0.78 0.07 145)' },
+  'Fermented':         { bg: 'oklch(0.91 0.05 145)', fg: 'oklch(0.32 0.08 145)', bd: 'oklch(0.78 0.07 145)' },
+  'Zero starch':       { bg: 'oklch(0.92 0.03 230)', fg: 'oklch(0.36 0.07 230)', bd: 'oklch(0.76 0.06 230)' },
+  'Dinner-safe':       { bg: 'oklch(0.92 0.03 230)', fg: 'oklch(0.36 0.07 230)', bd: 'oklch(0.76 0.06 230)' },
+  'Magnesium-rich':    { bg: 'oklch(0.93 0.04 88)',  fg: 'oklch(0.38 0.08 80)',  bd: 'oklch(0.78 0.08 88)' },
+  'Antioxidant':       { bg: 'oklch(0.93 0.04 88)',  fg: 'oklch(0.38 0.08 80)',  bd: 'oklch(0.78 0.08 88)' },
+  'Cooling':           { bg: 'oklch(0.92 0.03 230)', fg: 'oklch(0.36 0.07 230)', bd: 'oklch(0.76 0.06 230)' },
+  'Protein-forward':   { bg: 'oklch(0.93 0.035 40)', fg: 'oklch(0.40 0.08 35)',  bd: 'oklch(0.76 0.08 35)' },
+  'Glucose-blunted':   { bg: 'oklch(0.93 0.035 40)', fg: 'oklch(0.40 0.08 35)',  bd: 'oklch(0.76 0.08 35)' },
+  'Gluten-free':       { bg: 'oklch(0.93 0.022 90)', fg: 'oklch(0.34 0.035 140)', bd: 'oklch(0.84 0.025 95)' },
+  'Vegan':             { bg: 'oklch(0.91 0.05 145)', fg: 'oklch(0.32 0.08 145)', bd: 'oklch(0.78 0.07 145)' },
+  'Vegetarian':        { bg: 'oklch(0.91 0.05 145)', fg: 'oklch(0.32 0.08 145)', bd: 'oklch(0.78 0.07 145)' },
+  'Low-FODMAP':        { bg: 'oklch(0.93 0.022 90)', fg: 'oklch(0.34 0.035 140)', bd: 'oklch(0.84 0.025 95)' },
+  'Warming':           { bg: 'oklch(0.93 0.04 55)',  fg: 'oklch(0.38 0.08 50)',  bd: 'oklch(0.78 0.08 50)' },
+  'Quick':             { bg: 'oklch(0.93 0.022 90)', fg: 'oklch(0.34 0.035 140)', bd: 'oklch(0.84 0.025 95)' },
+};
+
+const tagStyle = (tag) => TAG_STYLES[tag] || { bg: 'oklch(0.93 0.022 90)', fg: 'oklch(0.34 0.035 140)', bd: 'oklch(0.84 0.025 95)' };
+
+// Primary display tags shown on cards (exclude noisy ones)
+const CARD_TAGS = ['Gut-healing', 'Ayurvedic-spiced', 'Seasonal', 'Probiotic', 'Fermented', 'Zero starch', 'Gluten-free', 'Low-FODMAP', 'Vegan', 'Vegetarian', 'Magnesium-rich', 'Antioxidant', 'Cooling', 'Warming'];
+
 Object.assign(window, {
   PHASES, phaseForDay,
-  RECIPES, recipeById, PLAN_BY_PHASE,
+  RECIPES, recipeById, PLAN_BY_PHASE, countPlantsToday,
   DIETS, ALLERGENS, ETHNICITIES, CUISINES, lifeStageFor,
   SUPERMARKETS, STORE_CATEGORIES, STORE_BRAND,
   brandFor, bestStoreFor,
+  TAG_STYLES, tagStyle, CARD_TAGS,
 });

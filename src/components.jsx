@@ -2,8 +2,25 @@
 
 const { useState, useEffect, useRef } = React;
 
-// Diagonally-striped image placeholder with monospace caption
-function ImagePlot({ label = 'food photograph', tone = 'paper', aspect = '4/3', round = 0, style = {}, children }) {
+// Image with real photo support — shows <img> when src is provided, striped placeholder otherwise
+function ImagePlot({ src, label = 'food photograph', tone = 'paper', aspect = '4/3', round = 0, style = {}, children }) {
+  const [imgFailed, setImgFailed] = useState(false);
+  if (src && !imgFailed) {
+    return (
+      <div style={{
+        aspectRatio: aspect, borderRadius: round, overflow: 'hidden',
+        position: 'relative', flexShrink: 0,
+        ...style,
+      }}>
+        <img
+          src={src} alt={label}
+          onError={() => setImgFailed(true)}
+          style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+        />
+        {children}
+      </div>
+    );
+  }
   const palettes = {
     paper:  { bg: 'oklch(0.90 0.018 65)', stripe: 'oklch(0.86 0.022 60)', ink: 'oklch(0.38 0.04 45)' },
     sage:   { bg: 'oklch(0.86 0.050 140)', stripe: 'oklch(0.82 0.060 140)', ink: 'oklch(0.34 0.060 140)' },
