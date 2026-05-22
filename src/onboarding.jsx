@@ -1,4 +1,4 @@
-// 5-step onboarding: Location → Diet → Cuisines → Allergies → Hormonal profile
+// 6-step onboarding: Location → Diet → Cuisines → Allergies → Profile → Hormonal profile
 
 const { useState: useState_OB } = React;
 
@@ -9,6 +9,7 @@ function Onboarding({ profile, setProfile, complete }) {
     { id: 'diet',      title: 'How do you eat?',           sub: 'Your baseline framework. We layer cycle phase and IR rules on top.' },
     { id: 'cuisines',  title: 'What do you reach for?',    sub: 'Pick the kitchens that already feel like home — recipes will lean here first.' },
     { id: 'allergies', title: 'What does your body avoid?', sub: 'Allergens and sensitivities — strict exclusion on every recipe.' },
+    { id: 'profile',   title: 'Your profile',              sub: 'Your name and height let us personalise your greeting and calculate your daily protein target.' },
     { id: 'cycle',     title: 'Your hormonal profile',     sub: "Age and heritage subtly shift your IR baseline. Your cycle phase decides today's meals." },
   ];
   const cur = steps[step];
@@ -38,7 +39,7 @@ function Onboarding({ profile, setProfile, complete }) {
 
         {/* Headline */}
         <div>
-          <window.Eyebrow>Set-up · 5 steps</window.Eyebrow>
+          <window.Eyebrow>Set-up · 6 steps</window.Eyebrow>
           <h1 style={{ fontFamily: 'Instrument Serif, serif', fontSize: 64, lineHeight: 1.02, color: 'oklch(0.28 0.040 145)', margin: '24px 0 18px', fontWeight: 400 }}>
             A meal plan that knows<br />
             <em style={{ color: 'oklch(0.55 0.10 35)' }}>what month it is</em><br />
@@ -84,6 +85,7 @@ function Onboarding({ profile, setProfile, complete }) {
           {cur.id === 'diet'      && <DietStep      profile={profile} setProfile={setProfile} />}
           {cur.id === 'cuisines'  && <CuisinesStep  profile={profile} setProfile={setProfile} />}
           {cur.id === 'allergies' && <AllergiesStep profile={profile} setProfile={setProfile} />}
+          {cur.id === 'profile'   && <ProfileStep   profile={profile} setProfile={setProfile} />}
           {cur.id === 'cycle'     && <CycleStep     profile={profile} setProfile={setProfile} />}
 
           {/* Back / Continue */}
@@ -338,7 +340,70 @@ function AllergiesStep({ profile, setProfile }) {
   );
 }
 
-// Step 5 — Hormonal profile
+// Step 5 — Name + height profile
+function ProfileStep({ profile, setProfile }) {
+  const proteinTarget = profile.height > 100 ? Math.round((profile.height - 100) * 1.5) : null;
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
+      {/* Name */}
+      <div>
+        <window.Eyebrow>Your name</window.Eyebrow>
+        <input
+          value={profile.name}
+          onChange={(e) => setProfile({ ...profile, name: e.target.value })}
+          placeholder="e.g. Sofia"
+          style={{
+            marginTop: 12, width: '100%', padding: '18px 20px', borderRadius: 14,
+            background: 'oklch(0.97 0.018 90)', border: '1px solid oklch(0.84 0.025 95)',
+            fontFamily: 'Instrument Serif, serif', fontSize: 36, color: 'oklch(0.28 0.040 145)',
+            outline: 'none',
+          }}
+        />
+        <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 13, color: 'oklch(0.52 0.035 135)', marginTop: 8 }}>
+          Used in your daily greeting and plan summaries.
+        </p>
+      </div>
+
+      {/* Height */}
+      <div>
+        <window.Eyebrow>Height</window.Eyebrow>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginTop: 12 }}>
+          <div style={{ padding: '20px 20px', borderRadius: 14, background: 'oklch(0.97 0.018 90)', border: '1px solid oklch(0.84 0.025 95)' }}>
+            <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 10, letterSpacing: '0.14em', color: 'oklch(0.54 0.035 135)', textTransform: 'uppercase' }}>Centimetres</div>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginTop: 10 }}>
+              <input
+                type="number" min="140" max="210" value={profile.height}
+                onChange={(e) => setProfile({ ...profile, height: parseInt(e.target.value) || 0 })}
+                style={{ width: 90, padding: 0, background: 'transparent', border: 'none', fontFamily: 'Instrument Serif, serif', fontSize: 52, color: 'oklch(0.28 0.040 145)', outline: 'none' }}
+              />
+              <span style={{ fontFamily: 'Instrument Serif, serif', fontSize: 22, color: 'oklch(0.52 0.035 135)', fontStyle: 'italic' }}>cm</span>
+            </div>
+          </div>
+          <div style={{ padding: '20px 20px', borderRadius: 14, background: proteinTarget ? 'oklch(0.28 0.040 145)' : 'oklch(0.97 0.018 90)', border: '1px solid oklch(0.84 0.025 95)', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+            <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 10, letterSpacing: '0.14em', color: proteinTarget ? 'oklch(0.72 0.045 100)' : 'oklch(0.54 0.035 135)', textTransform: 'uppercase' }}>Daily protein target</div>
+            {proteinTarget ? (
+              <>
+                <div style={{ fontFamily: 'Instrument Serif, serif', fontSize: 52, color: 'oklch(0.945 0.022 88)', lineHeight: 1, marginTop: 10 }}>
+                  {proteinTarget}<span style={{ fontSize: 22, fontStyle: 'italic', color: 'oklch(0.74 0.045 100)' }}>g</span>
+                </div>
+                <div style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 12.5, color: 'oklch(0.74 0.045 100)', marginTop: 6 }}>
+                  {Math.round(proteinTarget / (profile.meals || 3))}g per meal · IR formula
+                </div>
+              </>
+            ) : (
+              <div style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 13, color: 'oklch(0.54 0.035 135)', marginTop: 10 }}>Enter your height to calculate</div>
+            )}
+          </div>
+        </div>
+        <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 13, color: 'oklch(0.52 0.035 135)', marginTop: 10, lineHeight: 1.5 }}>
+          Mira uses the IR formula <em style={{ fontFamily: 'Instrument Serif, serif', fontSize: 15 }}>(height − 100) × 1.5</em> — higher than standard guidelines because insulin resistance requires more protein to preserve muscle while improving sensitivity.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+// Step 6 — Hormonal profile
 function CycleStep({ profile, setProfile }) {
   const stage = window.lifeStageFor(profile.age);
   const eth = window.ETHNICITIES.find(e => e.id === profile.ethnicity);
