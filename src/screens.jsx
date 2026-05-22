@@ -319,6 +319,16 @@ function Profile({ profile, setProfile, go }) {
         </div>
       </div>
 
+      {/* Health snapshot */}
+      <window.HealthSnapshot profile={profile} />
+
+      {/* AI Health Coach */}
+      <window.HealthCoach profile={profile} />
+
+      {/* ─── Settings ─── */}
+      <window.Eyebrow>Settings</window.Eyebrow>
+      <div style={{ marginBottom: 24 }} />
+
       <Block title="Identity">
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16 }}>
           <FieldInput label="Display name" value={profile.name} onChange={v => setProfile({ ...profile, name: v })} />

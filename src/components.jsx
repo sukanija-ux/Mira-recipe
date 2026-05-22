@@ -227,13 +227,21 @@ function TopNav({ route, go, profile }) {
           ))}
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-          <div style={{
-            width: 36, height: 36, borderRadius: 999,
-            background: 'oklch(0.86 0.060 40)',
-            border: '1px solid oklch(0.78 0.06 30)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontFamily: 'Instrument Serif, serif', color: 'oklch(0.30 0.06 30)', fontSize: 17,
-          }}>{profile.name[0]}</div>
+          <div
+            onClick={() => go('profile')}
+            title="View profile & health coach"
+            style={{
+              width: 36, height: 36, borderRadius: 999,
+              background: 'oklch(0.86 0.060 40)',
+              border: '1px solid oklch(0.78 0.06 30)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontFamily: 'Instrument Serif, serif', color: 'oklch(0.30 0.06 30)', fontSize: 17,
+              cursor: 'pointer',
+              transition: 'transform 0.15s ease, box-shadow 0.15s ease',
+            }}
+            onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.08)'; e.currentTarget.style.boxShadow = '0 2px 8px oklch(0.62 0.08 35 / 0.3)'; }}
+            onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.boxShadow = 'none'; }}
+          >{profile.name[0]}</div>
         </div>
       </div>
     </nav>
