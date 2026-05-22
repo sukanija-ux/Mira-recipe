@@ -2,23 +2,53 @@
 
 const { useState: useState_S } = React;
 
-// ─── Tracking mode tabs ────────────────────────────────────────────────────
+// ─── Tracking mode selector ────────────────────────────────────────────────
 const TRACKING_MODES = [
-  { id: 'cycle',      label: 'Cycle',      sub: 'Track your monthly phases' },
-  { id: 'pregnant',   label: 'Pregnant',   sub: 'Trimester nutrition' },
-  { id: 'postpartum', label: 'Postpartum', sub: 'Recovery & feeding' },
-  { id: 'menopause',  label: 'Menopause',  sub: 'Hormone transition' },
+  { id: 'cycle',      label: 'Cycle',      sub: 'I track my monthly phases',       icon: '◯' },
+  { id: 'pregnant',   label: 'Pregnant',   sub: 'I am currently pregnant',         icon: '○' },
+  { id: 'postpartum', label: 'Postpartum', sub: 'I recently gave birth',           icon: '◌' },
+  { id: 'menopause',  label: 'Menopause',  sub: 'I am in peri- or post-menopause', icon: '◉' },
 ];
 
-function ModeTab({ id, label, active, onClick }) {
+function ModePicker({ mode, onChange }) {
   return (
-    <button onClick={onClick} style={{
-      padding: '10px 20px', borderRadius: 999, cursor: 'pointer', border: 'none',
-      background: active ? 'oklch(0.28 0.040 145)' : 'transparent',
-      color: active ? 'oklch(0.945 0.022 88)' : 'oklch(0.52 0.035 135)',
-      fontFamily: 'DM Sans, sans-serif', fontSize: 13.5, fontWeight: active ? 500 : 400,
-      transition: 'all 0.2s ease',
-    }}>{label}</button>
+    <div style={{ marginBottom: 56 }}>
+      <window.Eyebrow>What describes you right now?</window.Eyebrow>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginTop: 16 }}>
+        {TRACKING_MODES.map(m => {
+          const active = mode === m.id;
+          return (
+            <button key={m.id} onClick={() => onChange(m.id)} style={{
+              padding: '20px 18px', borderRadius: 16, cursor: 'pointer', textAlign: 'left',
+              background: active ? 'oklch(0.28 0.040 145)' : 'oklch(0.97 0.018 90)',
+              border: active ? '1.5px solid oklch(0.28 0.040 145)' : '1.5px solid oklch(0.86 0.025 95)',
+              transition: 'all 0.18s ease',
+            }}>
+              {/* Radio dot */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+                <div style={{
+                  width: 16, height: 16, borderRadius: 999, flexShrink: 0,
+                  border: `2px solid ${active ? 'oklch(0.76 0.08 88)' : 'oklch(0.72 0.025 100)'}`,
+                  background: active ? 'oklch(0.76 0.08 88)' : 'transparent',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}>
+                  {active && <div style={{ width: 6, height: 6, borderRadius: 999, background: 'oklch(0.22 0.030 145)' }} />}
+                </div>
+                <span style={{
+                  fontFamily: 'JetBrains Mono, monospace', fontSize: 9.5, letterSpacing: '0.14em',
+                  textTransform: 'uppercase',
+                  color: active ? 'oklch(0.76 0.08 88)' : 'oklch(0.56 0.030 130)',
+                }}>{m.label}</span>
+              </div>
+              <div style={{
+                fontFamily: 'DM Sans, sans-serif', fontSize: 13, lineHeight: 1.4,
+                color: active ? 'oklch(0.82 0.022 90)' : 'oklch(0.46 0.035 135)',
+              }}>{m.sub}</div>
+            </button>
+          );
+        })}
+      </div>
+    </div>
   );
 }
 
@@ -271,11 +301,7 @@ function CycleCalendar({ profile, go, setProfile }) {
     <div style={{ maxWidth: 1180, margin: '0 auto', padding: '64px 32px 120px' }}>
 
       {/* Mode selector */}
-      <div style={{ display: 'flex', gap: 4, marginBottom: 56, padding: '6px', borderRadius: 999, background: 'oklch(0.91 0.018 90)', width: 'fit-content' }}>
-        {TRACKING_MODES.map(m => (
-          <ModeTab key={m.id} id={m.id} label={m.label} active={mode === m.id} onClick={() => changeMode(m.id)} />
-        ))}
-      </div>
+      <ModePicker mode={mode} onChange={changeMode} />
 
       {/* Pregnant / Postpartum / Menopause content */}
       {mode === 'pregnant'   && <PregnantView   profile={profile} setProfile={setProfile} />}
