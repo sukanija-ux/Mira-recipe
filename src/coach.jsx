@@ -191,33 +191,17 @@ Coaching principles:
   return (
     <section style={{ marginBottom: 56, padding: '32px 36px', borderRadius: 24, background: 'oklch(0.97 0.018 90)', border: '1px solid oklch(0.86 0.025 95)' }}>
       {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 22 }}>
-        <div>
-          <window.Eyebrow color={phase.color}>Health Coach · Powered by Claude</window.Eyebrow>
-          <h2 style={{ fontFamily: 'Instrument Serif, serif', fontSize: 36, fontWeight: 400, color: 'oklch(0.28 0.040 145)', margin: '10px 0 5px' }}>
-            Ask <em style={{ color: phase.color }}>anything</em> about your cycle & nutrition.
-          </h2>
-          <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 13, color: 'oklch(0.52 0.035 135)', lineHeight: 1.5 }}>
-            Knows your {phase.name} phase, IR targets, gut focus, and today's seed cycling. Conversations stay in your browser.
-          </p>
-        </div>
-        <button
-          onClick={() => setShowKey(s => !s)}
-          style={{
-            flexShrink: 0, marginLeft: 24,
-            background: 'none',
-            border: `1px solid ${apiKey ? 'oklch(0.72 0.10 138)' : 'oklch(0.84 0.025 95)'}`,
-            borderRadius: 999, padding: '7px 14px', cursor: 'pointer',
-            fontFamily: 'JetBrains Mono, monospace', fontSize: 9.5, letterSpacing: '0.1em',
-            color: apiKey ? 'oklch(0.52 0.09 138)' : 'oklch(0.54 0.035 135)',
-            textTransform: 'uppercase',
-          }}
-        >
-          {apiKey ? '✓ Key set' : 'Add API key'}
-        </button>
+      <div style={{ marginBottom: 22 }}>
+        <window.Eyebrow color={phase.color}>Health Coach · Powered by Claude</window.Eyebrow>
+        <h2 style={{ fontFamily: 'Instrument Serif, serif', fontSize: 36, fontWeight: 400, color: 'oklch(0.28 0.040 145)', margin: '10px 0 5px' }}>
+          Ask <em style={{ color: phase.color }}>anything</em> about your cycle & nutrition.
+        </h2>
+        <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 13, color: 'oklch(0.52 0.035 135)', lineHeight: 1.5 }}>
+          Knows your {phase.name} phase, IR targets, gut focus, and today's seed cycling. Conversations stay in your browser.
+        </p>
       </div>
 
-      {/* API key panel */}
+      {/* API key panel — hidden from users, toggle via Settings if needed */}
       {showKey && (
         <div style={{ padding: '20px 22px', borderRadius: 14, background: 'oklch(0.28 0.040 145)', marginBottom: 22 }}>
           <window.Eyebrow color="oklch(0.76 0.08 88)">Anthropic API key</window.Eyebrow>

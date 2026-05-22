@@ -29,6 +29,10 @@ function App() {
     age:       34,
     ethnicity: 'european',
     irregular: false,
+    trackingMode:   'cycle',   // 'cycle' | 'pregnant' | 'postpartum' | 'menopause'
+    pregnancyWeek:  12,
+    postpartumWeek: 6,
+    breastfeeding:  false,
   });
 
   const [onboarded, setOnboarded] = useState(!tweaks.showOnboarding);

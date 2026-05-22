@@ -4,17 +4,20 @@ const { useState: useState_R, useMemo: useMemo_R } = React;
 
 // Recipe library with phase + meal filters
 function RecipeBrowse({ profile, openRecipe }) {
-  const phase = window.phaseForDay(profile.day, profile.length);
-  const [filter, setFilter] = useState_R('all');
-  const [meal,   setMeal]   = useState_R('all');
+  const phase   = window.phaseForDay(profile.day, profile.length);
+  // Default to showing recipes for the current phase
+  const [filter,  setFilter]  = useState_R('phase');
+  const [meal,    setMeal]    = useState_R('all');
+  const [cuisine, setCuisine] = useState_R('all');
 
   const list = useMemo_R(() => {
     return window.RECIPES.filter(r => {
       if (filter === 'phase' && !r.phases.includes(phase.id)) return false;
       if (meal !== 'all' && r.meal !== meal) return false;
+      if (cuisine !== 'all' && r.cuisine !== cuisine) return false;
       return true;
     });
-  }, [filter, meal, phase.id]);
+  }, [filter, meal, cuisine, phase.id]);
 
   const tones = ['clay', 'sage', 'honey', 'plum', 'paper', 'clay'];
 
@@ -27,17 +30,27 @@ function RecipeBrowse({ profile, openRecipe }) {
         </h1>
       </header>
 
-      {/* Filter row */}
-      <div style={{ display: 'flex', gap: 24, alignItems: 'center', marginBottom: 40, paddingBottom: 18, borderBottom: '1px solid oklch(0.86 0.025 95)' }}>
-        {[{ id: 'all', l: 'All' }, { id: 'phase', l: `For ${phase.name.toLowerCase()}` }].map(b => (
-          <FilterPill key={b.id} active={filter === b.id} onClick={() => setFilter(b.id)}>{b.l}</FilterPill>
-        ))}
-        <span style={{ width: 1, height: 16, background: 'oklch(0.84 0.025 95)' }} />
-        {['all', 'breakfast', 'lunch', 'dinner'].map(m => (
-          <FilterPill key={m} active={meal === m} onClick={() => setMeal(m)}>
-            {m === 'all' ? 'Any meal' : m.charAt(0).toUpperCase() + m.slice(1)}
-          </FilterPill>
-        ))}
+      {/* Filter rows */}
+      <div style={{ marginBottom: 40, paddingBottom: 18, borderBottom: '1px solid oklch(0.86 0.025 95)' }}>
+        {/* Row 1: Phase + Meal */}
+        <div style={{ display: 'flex', gap: 24, alignItems: 'center', marginBottom: 14, flexWrap: 'wrap' }}>
+          {[{ id: 'phase', l: `✦ ${phase.name} phase` }, { id: 'all', l: 'All phases' }].map(b => (
+            <FilterPill key={b.id} active={filter === b.id} color={filter === b.id && b.id === 'phase' ? phase.color : null} onClick={() => setFilter(b.id)}>{b.l}</FilterPill>
+          ))}
+          <span style={{ width: 1, height: 16, background: 'oklch(0.84 0.025 95)' }} />
+          {['all', 'breakfast', 'lunch', 'dinner'].map(m => (
+            <FilterPill key={m} active={meal === m} onClick={() => setMeal(m)}>
+              {m === 'all' ? 'Any meal' : m.charAt(0).toUpperCase() + m.slice(1)}
+            </FilterPill>
+          ))}
+        </div>
+        {/* Row 2: Cuisine */}
+        <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
+          <FilterPill active={cuisine === 'all'} onClick={() => setCuisine('all')}>All cuisines</FilterPill>
+          {window.RECIPE_CUISINE_FILTERS.map(c => (
+            <FilterPill key={c.id} active={cuisine === c.id} onClick={() => setCuisine(c.id)}>{c.label}</FilterPill>
+          ))}
+        </div>
       </div>
 
       {/* Editorial 3-col grid */}
@@ -81,13 +94,18 @@ function RecipeBrowse({ profile, openRecipe }) {
   );
 }
 
-function FilterPill({ active, onClick, children }) {
+function FilterPill({ active, onClick, children, color }) {
+  const activeColor = color || 'oklch(0.28 0.040 145)';
   return (
     <button onClick={onClick} style={{
-      background: 'none', border: 'none', cursor: 'pointer', padding: 0,
-      fontFamily: 'DM Sans, sans-serif', fontSize: 14,
-      color: active ? 'oklch(0.28 0.040 145)' : 'oklch(0.56 0.030 130)',
+      background: active ? activeColor + '18' : 'none',
+      border: active ? `1px solid ${activeColor}50` : '1px solid transparent',
+      borderRadius: 999, padding: active ? '5px 12px' : '5px 0',
+      cursor: 'pointer',
+      fontFamily: 'DM Sans, sans-serif', fontSize: 13.5,
+      color: active ? activeColor : 'oklch(0.56 0.030 130)',
       fontWeight: active ? 600 : 400,
+      transition: 'all 0.15s ease',
     }}>{children}</button>
   );
 }

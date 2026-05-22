@@ -2,13 +2,288 @@
 
 const { useState: useState_S } = React;
 
-// Cycle calendar — ring + 28-day strip + 4 phase chapters
+// ─── Tracking mode tabs ────────────────────────────────────────────────────
+const TRACKING_MODES = [
+  { id: 'cycle',      label: 'Cycle',      sub: 'Track your monthly phases' },
+  { id: 'pregnant',   label: 'Pregnant',   sub: 'Trimester nutrition' },
+  { id: 'postpartum', label: 'Postpartum', sub: 'Recovery & feeding' },
+  { id: 'menopause',  label: 'Menopause',  sub: 'Hormone transition' },
+];
+
+function ModeTab({ id, label, active, onClick }) {
+  return (
+    <button onClick={onClick} style={{
+      padding: '10px 20px', borderRadius: 999, cursor: 'pointer', border: 'none',
+      background: active ? 'oklch(0.28 0.040 145)' : 'transparent',
+      color: active ? 'oklch(0.945 0.022 88)' : 'oklch(0.52 0.035 135)',
+      fontFamily: 'DM Sans, sans-serif', fontSize: 13.5, fontWeight: active ? 500 : 400,
+      transition: 'all 0.2s ease',
+    }}>{label}</button>
+  );
+}
+
+// ─── Pregnant view ──────────────────────────────────────────────────────────
+function PregnantView({ profile, setProfile }) {
+  const week = profile.pregnancyWeek || 12;
+  const trimester = week <= 12 ? 1 : week <= 26 ? 2 : 3;
+  const T = {
+    1: {
+      label: 'First Trimester', weeks: 'Weeks 1–12',
+      color: 'oklch(0.62 0.08 230)', soft: 'oklch(0.93 0.025 230)',
+      headline: 'Foundation & folate.',
+      body: 'The embryo\'s neural tube forms in weeks 3–4 — folate is critical before most women know they\'re pregnant. Nausea peaks weeks 6–10; small, frequent, protein-rich meals reduce cortisol and stabilise blood sugar.',
+      needs: ['Folate / Methylfolate', 'Iron', 'B6 (nausea)', 'Zinc', 'Magnesium', 'Choline'],
+      avoid: ['Alcohol', 'High-mercury fish', 'Raw eggs', 'Soft cheeses', 'Liver pâté'],
+      tips: 'Eat protein within 30 minutes of waking. Ginger (fresh or tea) reduces nausea by 40% in clinical trials. Keep meals small and warm.',
+    },
+    2: {
+      label: 'Second Trimester', weeks: 'Weeks 13–26',
+      color: 'oklch(0.58 0.09 140)', soft: 'oklch(0.93 0.030 140)',
+      headline: 'Growth & iron.',
+      body: 'Blood volume expands by 50%. Iron deficiency anaemia peaks here — pair iron-rich foods with Vitamin C. Baby\'s bones, brain, and organs are developing rapidly. Protein target increases by ~25g/day.',
+      needs: ['Iron + Vitamin C', 'Calcium', 'DHA Omega-3', 'Protein +25g', 'Vitamin D', 'B12'],
+      avoid: ['Processed meats', 'Raw fish (sushi)', 'Unpasteurised dairy', 'Excess caffeine'],
+      tips: 'Eat leafy greens with lemon or bell pepper for iron absorption. Wild salmon and sardines are the safest omega-3 sources. Constipation peaks — aim for 30g fibre daily.',
+    },
+    3: {
+      label: 'Third Trimester', weeks: 'Weeks 27–40+',
+      color: 'oklch(0.76 0.10 88)', soft: 'oklch(0.94 0.040 88)',
+      headline: 'DHA, collagen, prepare.',
+      body: 'Baby\'s brain grows fastest in the last 10 weeks — DHA is the structural fat of brain tissue. Progesterone peaks causing heartburn and slow digestion. Smaller, more frequent meals are essential.',
+      needs: ['DHA Omega-3', 'Collagen/Glycine', 'Magnesium', 'Calcium', 'Vitamin K2', 'Choline'],
+      avoid: ['Large meals', 'Spicy food (heartburn)', 'Carbonated drinks', 'High-glycemic carbs'],
+      tips: 'Eat smaller meals more frequently. Bone broth daily supports collagen for the birth canal. Dates from week 36 may help cervical ripening (3 trials show reduced induction rates).',
+    },
+  }[trimester];
+
+  return (
+    <div>
+      <header style={{ marginBottom: 56 }}>
+        <window.Eyebrow>Pregnant · {T.weeks}</window.Eyebrow>
+        <h1 style={{ fontFamily: 'Instrument Serif, serif', fontSize: 72, lineHeight: 0.98, color: 'oklch(0.28 0.040 145)', margin: '18px 0 0', fontWeight: 400 }}>
+          <em style={{ color: T.color }}>{T.label}.</em>
+        </h1>
+        <p style={{ fontFamily: 'Instrument Serif, serif', fontSize: 22, lineHeight: 1.45, color: 'oklch(0.46 0.035 135)', margin: '20px 0 0', maxWidth: 680, fontStyle: 'italic' }}>
+          {T.headline} {T.body}
+        </p>
+      </header>
+
+      {/* Week scrubber */}
+      <section style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 48, marginBottom: 56, padding: '32px', borderRadius: 20, background: T.soft, border: `1px solid ${T.color}40` }}>
+        <div>
+          <window.Eyebrow color={T.color}>Pregnancy week</window.Eyebrow>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, margin: '14px 0 20px' }}>
+            <span style={{ fontFamily: 'Instrument Serif, serif', fontSize: 80, lineHeight: 1, color: T.color, fontWeight: 400 }}>{week}</span>
+            <span style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 16, color: 'oklch(0.50 0.035 135)' }}>/ 42 weeks</span>
+          </div>
+          <input type="range" min={1} max={42} value={week}
+            onChange={e => setProfile({ ...profile, pregnancyWeek: parseInt(e.target.value) })}
+            style={{ width: '100%', accentColor: T.color }}
+          />
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4 }}>
+            {['T1 (1–12)', 'T2 (13–26)', 'T3 (27–42)'].map((t, i) => (
+              <span key={i} style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 9, color: 'oklch(0.54 0.035 135)', letterSpacing: '0.06em' }}>{t}</span>
+            ))}
+          </div>
+        </div>
+        <div>
+          <window.Eyebrow>Quick tips for week {week}</window.Eyebrow>
+          <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 14, lineHeight: 1.65, color: 'oklch(0.38 0.035 140)', margin: '12px 0 0' }}>{T.tips}</p>
+        </div>
+      </section>
+
+      {/* Needs + Avoid grid */}
+      <section style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24, marginBottom: 56 }}>
+        <div style={{ padding: '24px 28px', borderRadius: 16, background: T.soft, border: `1px solid ${T.color}30` }}>
+          <window.Eyebrow color={T.color}>Prioritise · {T.label}</window.Eyebrow>
+          <div style={{ fontFamily: 'Instrument Serif, serif', fontSize: 20, lineHeight: 1.6, color: 'oklch(0.28 0.040 145)', margin: '12px 0 0' }}>
+            {T.needs.join(' · ')}
+          </div>
+        </div>
+        <div style={{ padding: '24px 28px', borderRadius: 16, background: 'oklch(0.28 0.040 145)' }}>
+          <window.Eyebrow color="oklch(0.62 0.11 35)">Avoid during pregnancy</window.Eyebrow>
+          <div style={{ fontFamily: 'Instrument Serif, serif', fontSize: 20, lineHeight: 1.6, color: 'oklch(0.78 0.025 95)', margin: '12px 0 0', fontStyle: 'italic' }}>
+            {T.avoid.join(' · ')}
+          </div>
+        </div>
+      </section>
+      <div style={{ padding: '16px 20px', borderRadius: 12, background: 'oklch(0.94 0.040 88)', border: '1px solid oklch(0.78 0.090 88)50' }}>
+        <window.Eyebrow color="oklch(0.40 0.090 80)">Always consult your midwife or OB</window.Eyebrow>
+        <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 12.5, color: 'oklch(0.44 0.050 80)', margin: '6px 0 0', lineHeight: 1.5 }}>
+          Nutritional needs during pregnancy are highly individual. These guidelines are evidence-based overviews — your healthcare provider should guide any specific supplementation or dietary restriction.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+// ─── Postpartum view ────────────────────────────────────────────────────────
+function PostpartumView({ profile, setProfile }) {
+  const weeks = profile.postpartumWeek || 6;
+  const bf    = profile.breastfeeding || false;
+
+  const stage = weeks <= 2 ? {
+    label: 'Immediate Recovery', color: 'oklch(0.62 0.11 35)', soft: 'oklch(0.93 0.035 40)',
+    body: 'The uterus is contracting back. Blood loss is high — iron and collagen are the priority. Rest is medicine. Warm, easy-to-digest, deeply nourishing foods only.',
+    needs: ['Iron + Vitamin C', 'Collagen / Bone broth', 'Magnesium', 'Zinc', 'B12', 'Warming soups'],
+  } : weeks <= 8 ? {
+    label: 'Early Postpartum', color: 'oklch(0.58 0.09 140)', soft: 'oklch(0.93 0.030 140)',
+    body: 'Hormones are resetting rapidly. Postpartum hair loss peaks at weeks 3–6 (telogen effluvium) — biotin, iron, and zinc are critical. Gut motility is still slow.',
+    needs: ['Biotin', 'Iron', 'Zinc', 'Vitamin D', 'Omega-3 DHA', 'Fiber for motility'],
+  } : {
+    label: 'Recovery & Rebuild', color: 'oklch(0.62 0.08 230)', soft: 'oklch(0.93 0.025 230)',
+    body: 'Hormones are approaching pre-pregnancy baseline. Energy returns. This is the phase to rebuild microbiome diversity and restore muscle protein mass.',
+    needs: ['High protein', 'Plant diversity (30/week)', 'Magnesium', 'B vitamins', 'Probiotics'],
+  };
+
+  return (
+    <div>
+      <header style={{ marginBottom: 56 }}>
+        <window.Eyebrow>Postpartum · Week {weeks}</window.Eyebrow>
+        <h1 style={{ fontFamily: 'Instrument Serif, serif', fontSize: 72, lineHeight: 0.98, color: 'oklch(0.28 0.040 145)', margin: '18px 0 0', fontWeight: 400 }}>
+          <em style={{ color: stage.color }}>{stage.label}.</em>
+        </h1>
+        <p style={{ fontFamily: 'Instrument Serif, serif', fontSize: 22, lineHeight: 1.45, color: 'oklch(0.46 0.035 135)', margin: '20px 0 0', maxWidth: 680, fontStyle: 'italic' }}>
+          {stage.body}
+        </p>
+      </header>
+
+      {/* Week scrubber + breastfeeding */}
+      <section style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 48, alignItems: 'start', marginBottom: 56, padding: '32px', borderRadius: 20, background: stage.soft, border: `1px solid ${stage.color}40` }}>
+        <div>
+          <window.Eyebrow color={stage.color}>Weeks since birth</window.Eyebrow>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, margin: '14px 0 20px' }}>
+            <span style={{ fontFamily: 'Instrument Serif, serif', fontSize: 80, lineHeight: 1, color: stage.color, fontWeight: 400 }}>{weeks}</span>
+            <span style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 16, color: 'oklch(0.50 0.035 135)' }}>weeks postpartum</span>
+          </div>
+          <input type="range" min={0} max={52} value={weeks}
+            onChange={e => setProfile({ ...profile, postpartumWeek: parseInt(e.target.value) })}
+            style={{ width: '100%', accentColor: stage.color }}
+          />
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4 }}>
+            {['0 wk', '6 wk', '3 mo', '6 mo', '12 mo'].map((t, i) => (
+              <span key={i} style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 9, color: 'oklch(0.54 0.035 135)', letterSpacing: '0.06em' }}>{t}</span>
+            ))}
+          </div>
+        </div>
+
+        {/* Breastfeeding toggle */}
+        <div style={{ padding: '24px 28px', borderRadius: 16, background: 'oklch(0.28 0.040 145)', minWidth: 220 }}>
+          <window.Eyebrow color="oklch(0.76 0.08 88)">Breastfeeding?</window.Eyebrow>
+          <div style={{ display: 'flex', gap: 10, marginTop: 16 }}>
+            {[{ v: true, l: 'Yes, nursing' }, { v: false, l: 'No / Weaning' }].map(opt => (
+              <button key={String(opt.v)} onClick={() => setProfile({ ...profile, breastfeeding: opt.v })} style={{
+                flex: 1, padding: '12px 10px', borderRadius: 10, cursor: 'pointer',
+                background: bf === opt.v ? 'oklch(0.76 0.08 88)' : 'oklch(0.34 0.030 145)',
+                border: 'none',
+                fontFamily: 'DM Sans, sans-serif', fontSize: 12.5, fontWeight: bf === opt.v ? 600 : 400,
+                color: bf === opt.v ? 'oklch(0.22 0.030 145)' : 'oklch(0.76 0.025 90)',
+                transition: 'all 0.2s ease',
+              }}>{opt.l}</button>
+            ))}
+          </div>
+          {bf && (
+            <div style={{ marginTop: 14, fontFamily: 'DM Sans, sans-serif', fontSize: 12, color: 'oklch(0.75 0.020 90)', lineHeight: 1.55 }}>
+              +500 kcal/day · +25g protein · +200mg DHA · avoid alcohol & high-mercury fish
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* Needs */}
+      <section style={{ padding: '24px 28px', borderRadius: 16, background: stage.soft, border: `1px solid ${stage.color}30`, marginBottom: 24 }}>
+        <window.Eyebrow color={stage.color}>Priority nutrients · {stage.label}</window.Eyebrow>
+        <div style={{ fontFamily: 'Instrument Serif, serif', fontSize: 22, lineHeight: 1.6, color: 'oklch(0.28 0.040 145)', margin: '12px 0 0' }}>
+          {bf ? [...stage.needs, 'Iodine', 'Choline (eggs, liver)'].join(' · ') : stage.needs.join(' · ')}
+        </div>
+      </section>
+      <div style={{ padding: '16px 20px', borderRadius: 12, background: 'oklch(0.94 0.040 88)', border: '1px solid oklch(0.78 0.090 88)50' }}>
+        <window.Eyebrow color="oklch(0.40 0.090 80)">Consult your midwife or health visitor</window.Eyebrow>
+        <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 12.5, color: 'oklch(0.44 0.050 80)', margin: '6px 0 0', lineHeight: 1.5 }}>
+          Postpartum recovery is highly individual. If you're experiencing postpartum depression, low milk supply, or unusual symptoms, please consult a healthcare professional.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+// ─── Menopause view ─────────────────────────────────────────────────────────
+function MenopauseView({ profile }) {
+  const age = profile.age || 50;
+  const isPeri = age < 52;
+  const phase = {
+    label: isPeri ? 'Perimenopause' : 'Postmenopause',
+    color: isPeri ? 'oklch(0.76 0.10 88)' : 'oklch(0.62 0.08 230)',
+    soft:  isPeri ? 'oklch(0.94 0.040 88)' : 'oklch(0.93 0.025 230)',
+    body: isPeri
+      ? 'Oestrogen fluctuates wildly — not declining linearly. Cycles become irregular. Insulin resistance worsens. Gut microbiome diversity drops. The Estrobolome is most influential here: fibre diversity directly determines how surplus oestrogen is cleared or recirculated.'
+      : 'Oestrogen has settled at a new, lower baseline. Bone density loss accelerates for 5–7 years. Insulin resistance peaks. The focus shifts to phytoestrogens (gentle receptor support), calcium, Vitamin D, and muscle-preserving protein.',
+    needs: isPeri
+      ? ['Phytoestrogens (flax, soy)', 'Magnesium', 'Plant diversity 30+/wk', 'Omega-3', 'Adaptogens (ashwagandha)', 'Vitamin B6', 'Zinc']
+      : ['Calcium + Vitamin D3 + K2', 'High protein (1.6–2g/kg)', 'Phytoestrogens', 'Omega-3 DHA', 'Creatine (muscle)', 'Magnesium'],
+    avoid: ['Refined sugar (worsens IR)', 'Alcohol', 'Processed soy', 'Ultra-processed food'],
+    gutNote: 'Menopause causes a measurable decline in Lactobacillus. 30+ plant foods/week, daily fermented foods, and flaxseed are the most evidence-based interventions to maintain Estrobolome function without oestrogen. This is when microbiome diversity matters most.',
+  };
+
+  return (
+    <div>
+      <header style={{ marginBottom: 56 }}>
+        <window.Eyebrow>{phase.label} · Age {age}</window.Eyebrow>
+        <h1 style={{ fontFamily: 'Instrument Serif, serif', fontSize: 72, lineHeight: 0.98, color: 'oklch(0.28 0.040 145)', margin: '18px 0 0', fontWeight: 400 }}>
+          Nourish the <em style={{ color: phase.color }}>transition.</em>
+        </h1>
+        <p style={{ fontFamily: 'Instrument Serif, serif', fontSize: 22, lineHeight: 1.45, color: 'oklch(0.46 0.035 135)', margin: '20px 0 0', maxWidth: 700, fontStyle: 'italic' }}>
+          {phase.body}
+        </p>
+      </header>
+
+      <section style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24, marginBottom: 32 }}>
+        <div style={{ padding: '24px 28px', borderRadius: 16, background: phase.soft, border: `1px solid ${phase.color}35` }}>
+          <window.Eyebrow color={phase.color}>Prioritise · {phase.label}</window.Eyebrow>
+          <div style={{ fontFamily: 'Instrument Serif, serif', fontSize: 19, lineHeight: 1.65, color: 'oklch(0.28 0.040 145)', margin: '12px 0 0' }}>
+            {phase.needs.join(' · ')}
+          </div>
+        </div>
+        <div style={{ padding: '24px 28px', borderRadius: 16, background: 'oklch(0.28 0.040 145)' }}>
+          <window.Eyebrow color="oklch(0.62 0.11 35)">Avoid / minimise</window.Eyebrow>
+          <div style={{ fontFamily: 'Instrument Serif, serif', fontSize: 19, lineHeight: 1.65, color: 'oklch(0.78 0.025 95)', margin: '12px 0 0', fontStyle: 'italic' }}>
+            {phase.avoid.join(' · ')}
+          </div>
+        </div>
+      </section>
+      <div style={{ padding: '22px 26px', borderRadius: 16, background: phase.soft, border: `1px solid ${phase.color}25` }}>
+        <window.Eyebrow color={phase.color}>Estrobolome & gut health</window.Eyebrow>
+        <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 14, lineHeight: 1.65, color: 'oklch(0.36 0.035 140)', margin: '10px 0 0' }}>{phase.gutNote}</p>
+      </div>
+    </div>
+  );
+}
+
+// ─── Cycle calendar — ring + 28-day strip + 4 phase chapters ───────────────
 function CycleCalendar({ profile, go, setProfile }) {
   const phase = window.phaseForDay(profile.day, profile.length);
   const days  = [...Array(profile.length)].map((_, i) => i + 1);
+  const mode  = profile.trackingMode || 'cycle';
+
+  const changeMode = (m) => setProfile({ ...profile, trackingMode: m });
 
   return (
     <div style={{ maxWidth: 1180, margin: '0 auto', padding: '64px 32px 120px' }}>
+
+      {/* Mode selector */}
+      <div style={{ display: 'flex', gap: 4, marginBottom: 56, padding: '6px', borderRadius: 999, background: 'oklch(0.91 0.018 90)', width: 'fit-content' }}>
+        {TRACKING_MODES.map(m => (
+          <ModeTab key={m.id} id={m.id} label={m.label} active={mode === m.id} onClick={() => changeMode(m.id)} />
+        ))}
+      </div>
+
+      {/* Pregnant / Postpartum / Menopause content */}
+      {mode === 'pregnant'   && <PregnantView   profile={profile} setProfile={setProfile} />}
+      {mode === 'postpartum' && <PostpartumView profile={profile} setProfile={setProfile} />}
+      {mode === 'menopause'  && <MenopauseView  profile={profile} />}
+
+      {/* Cycle content (shown only when mode === 'cycle') */}
+      {mode === 'cycle' && (<>
 
       <header style={{ marginBottom: 64 }}>
         <window.Eyebrow>Cycle calendar · {profile.length}-day cycle · Day {profile.day}</window.Eyebrow>
@@ -134,6 +409,8 @@ function CycleCalendar({ profile, go, setProfile }) {
           );
         })}
       </div>
+
+      </>)} {/* end mode === 'cycle' */}
     </div>
   );
 }
