@@ -227,7 +227,6 @@ function TopNav({ route, go, profile }) {
           ))}
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-          <Eyebrow>{profile.markets[0] || 'REWE'}</Eyebrow>
           <div style={{
             width: 36, height: 36, borderRadius: 999,
             background: 'oklch(0.86 0.060 40)',
