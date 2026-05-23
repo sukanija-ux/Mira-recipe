@@ -85,9 +85,8 @@ function HealthSnapshot({ profile }) {
 
 // ─── Health Coach ─────────────────────────────────────────────────────────────
 
-const GROQ_URL   = 'https://api.groq.com/openai/v1/chat/completions';
-const GROQ_MODEL = 'llama-3.1-8b-instant';
-const STORAGE_KEY = 'mira_groq_key';
+const AI_URL   = 'https://text.pollinations.ai/openai';
+const AI_MODEL = 'openai';  // free, no key required
 
 function HealthCoach({ profile }) {
   const phase         = window.phaseForDay(profile.day, profile.length);
@@ -98,25 +97,11 @@ function HealthCoach({ profile }) {
   const [input,     setInput]     = useState_C('');
   const [loading,   setLoading]   = useState_C(false);
   const [error,     setError]     = useState_C('');
-  const [apiKey,    setApiKey]    = useState_C(() => localStorage.getItem(STORAGE_KEY) || '');
-  const [showKey,   setShowKey]   = useState_C(false);
-  const [keyDraft,  setKeyDraft]  = useState_C('');
   const endRef = useRef_C(null);
 
   useEffect_C(() => {
     if (messages.length) endRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
-
-  const hasKey = apiKey.startsWith('gsk_');
-
-  const saveKey = () => {
-    const k = keyDraft.trim();
-    localStorage.setItem(STORAGE_KEY, k);
-    setApiKey(k);
-    setShowKey(false);
-    setKeyDraft('');
-    setError('');
-  };
 
   // Build conditions context
   const conditionNotes = (profile.conditions || []).map(cid => {
@@ -154,7 +139,6 @@ Coaching principles:
 
   const send = async () => {
     if (!input.trim() || loading) return;
-    if (!hasKey) { setShowKey(true); setError('Add your free Groq key below to enable the coach.'); return; }
 
     const userMsg = { role: 'user', content: input.trim() };
     const history = [...messages, userMsg];
@@ -164,14 +148,11 @@ Coaching principles:
     setError('');
 
     try {
-      const res = await fetch(GROQ_URL, {
+      const res = await fetch(AI_URL, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${apiKey}`,
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          model: GROQ_MODEL,
+          model: AI_MODEL,
           max_tokens: 1024,
           temperature: 0.7,
           messages: [
@@ -183,9 +164,7 @@ Coaching principles:
 
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
-        const msg = err?.error?.message || `API error ${res.status}`;
-        if (res.status === 401) { setApiKey(''); localStorage.removeItem(STORAGE_KEY); }
-        throw new Error(msg);
+        throw new Error(err?.error?.message || `Error ${res.status} — please try again.`);
       }
       const data  = await res.json();
       const reply = data.choices?.[0]?.message?.content || '';
@@ -209,52 +188,15 @@ Coaching principles:
       {/* Header */}
       <div style={{ marginBottom: 22 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-          <window.Eyebrow color={phase.color}>Health Coach · Llama 3.1 (Groq)</window.Eyebrow>
-          <button onClick={() => { setShowKey(!showKey); setKeyDraft(apiKey); }} style={{
-            background: hasKey ? 'oklch(0.91 0.04 140)' : 'oklch(0.94 0.04 35)',
-            border: hasKey ? '1px solid oklch(0.78 0.07 140)' : '1px solid oklch(0.80 0.08 35)',
-            borderRadius: 999, padding: '4px 12px', cursor: 'pointer',
-            fontFamily: 'JetBrains Mono, monospace', fontSize: 10, letterSpacing: '0.06em',
-            color: hasKey ? 'oklch(0.36 0.08 140)' : 'oklch(0.44 0.10 35)',
-          }}>
-            {hasKey ? '● KEY ACTIVE' : '○ ADD KEY'}
-          </button>
+          <window.Eyebrow color={phase.color}>Health Coach · AI-powered · Free</window.Eyebrow>
         </div>
         <h2 style={{ fontFamily: 'Instrument Serif, serif', fontSize: 36, fontWeight: 400, color: 'oklch(0.28 0.040 145)', margin: '10px 0 5px' }}>
           Ask <em style={{ color: phase.color }}>anything</em> about your cycle & nutrition.
         </h2>
         <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 13, color: 'oklch(0.52 0.035 135)', lineHeight: 1.5 }}>
-          Powered by Llama 3.1 (open-source) via Groq. Knows your {phase.name} phase, IR targets{profile.conditions?.length ? ', your health conditions' : ''}, and seed cycling. Conversations stay in your browser.
+          Knows your {phase.name} phase, IR targets{profile.conditions?.length ? ', your health conditions' : ''}, and seed cycling. No account needed — just ask.
         </p>
       </div>
-
-      {/* API key setup panel */}
-      {showKey && (
-        <div style={{ marginBottom: 22, padding: '20px 22px', borderRadius: 14, background: 'oklch(0.945 0.022 88)', border: '1px solid oklch(0.84 0.025 95)' }}>
-          <window.Eyebrow>Groq API Key (free)</window.Eyebrow>
-          <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 13, color: 'oklch(0.46 0.035 135)', margin: '6px 0 14px', lineHeight: 1.55 }}>
-            1. Sign up free at <strong>console.groq.com</strong> — no credit card needed.<br />
-            2. Create an API key and paste it here. It's saved only in your browser.
-          </p>
-          <div style={{ display: 'flex', gap: 10 }}>
-            <input
-              type="password"
-              value={keyDraft}
-              onChange={e => setKeyDraft(e.target.value)}
-              onKeyDown={e => e.key === 'Enter' && saveKey()}
-              placeholder="gsk_..."
-              style={{
-                flex: 1, padding: '10px 14px', borderRadius: 10,
-                border: '1px solid oklch(0.82 0.025 95)',
-                background: 'white', fontFamily: 'JetBrains Mono, monospace',
-                fontSize: 13, color: 'oklch(0.28 0.040 145)', outline: 'none',
-              }}
-            />
-            <window.Button onClick={saveKey} variant="primary" size="sm">Save key</window.Button>
-            <window.Button onClick={() => setShowKey(false)} variant="ghost" size="sm">Cancel</window.Button>
-          </div>
-        </div>
-      )}
 
       {/* Message thread */}
       {messages.length > 0 && (
@@ -304,13 +246,6 @@ Coaching principles:
         </div>
       )}
 
-      {/* Error when no key */}
-      {!hasKey && !showKey && error && (
-        <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 13, color: 'oklch(0.54 0.12 35)', marginBottom: 14, padding: '10px 14px', borderRadius: 10, background: 'oklch(0.96 0.03 35)', border: '1px solid oklch(0.88 0.06 35)' }}>
-          ⚠ {error}
-        </p>
-      )}
-
       {/* Suggestion chips */}
       {messages.length === 0 && (
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 18 }}>
@@ -333,7 +268,7 @@ Coaching principles:
           value={input}
           onChange={e => setInput(e.target.value)}
           onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } }}
-          placeholder={hasKey ? `Ask about your ${phase.name.toLowerCase()} phase, IR meals, or gut health…` : 'Add your free Groq key (↑ button above) to start chatting…'}
+          placeholder={`Ask about your ${phase.name.toLowerCase()} phase, IR meals, or gut health…`}
           rows={2}
           style={{
             flex: 1, padding: '12px 15px', borderRadius: 12,
@@ -349,7 +284,7 @@ Coaching principles:
         </window.Button>
       </div>
       <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 9, color: 'oklch(0.64 0.020 130)', letterSpacing: '0.09em', marginTop: 8, textTransform: 'uppercase' }}>
-        Enter to send · Shift+Enter for line break · Free Groq key · Not medical advice
+        Enter to send · Shift+Enter for line break · Not medical advice
       </div>
     </section>
   );
