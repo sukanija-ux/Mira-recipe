@@ -8,8 +8,8 @@ const AI_PROVIDERS = [
     id: 'claude',
     name: 'Claude',
     maker: 'Anthropic',
-    models: [{ id: 'claude-haiku-4-5', label: 'Claude Haiku (fast)' }, { id: 'claude-sonnet-4-5', label: 'Claude Sonnet (best)' }],
-    defaultModel: 'claude-haiku-4-5',
+    models: [{ id: 'claude-3-5-haiku-20241022', label: 'Claude 3.5 Haiku (fast)' }, { id: 'claude-sonnet-4-5', label: 'Claude Sonnet 4.5 (best)' }],
+    defaultModel: 'claude-3-5-haiku-20241022',
     placeholder: 'sk-ant-api03-…',
     keyPrefix: 'sk-ant-',
     keyHint: 'console.anthropic.com',
@@ -497,8 +497,42 @@ function AIConnectBlock() {
   const [models,     setModels]     = useState_S(() => {
     try { return JSON.parse(localStorage.getItem('mira_ai_models') || '{}'); } catch { return {}; }
   });
-  const [editing,    setEditing]    = useState_S(null);   // provider id being edited
+  const [editing,    setEditing]    = useState_S(null);
   const [draft,      setDraft]      = useState_S('');
+  const [testing,    setTesting]    = useState_S(null);   // provider id being tested
+  const [testResult, setTestResult] = useState_S({});     // { [id]: 'ok' | 'error message' }
+
+  const testConnection = async (p) => {
+    setTesting(p.id);
+    setTestResult(r => ({ ...r, [p.id]: null }));
+    const key = keys[p.id];
+    let mods = {}; try { mods = JSON.parse(localStorage.getItem('mira_ai_models') || '{}'); } catch {}
+    try {
+      if (p.id === 'claude') {
+        const model = mods['claude'] || 'claude-3-5-haiku-20241022';
+        const res = await fetch('https://api.anthropic.com/v1/messages', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+          body: JSON.stringify({ model, max_tokens: 20, system: 'Reply with only: OK', messages: [{ role: 'user', content: 'ping' }] }),
+        });
+        if (!res.ok) { const e = await res.json().catch(() => ({})); throw new Error(res.status === 401 ? 'Invalid API key' : e?.error?.message || `Error ${res.status}`); }
+      } else {
+        const url = p.id === 'openai' ? 'https://api.openai.com/v1/chat/completions' : 'https://api.groq.com/openai/v1/chat/completions';
+        const model = mods[p.id] || (p.id === 'openai' ? 'gpt-4o-mini' : 'llama-3.1-8b-instant');
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${key}` },
+          body: JSON.stringify({ model, max_tokens: 5, messages: [{ role: 'user', content: 'ping' }] }),
+        });
+        if (!res.ok) { const e = await res.json().catch(() => ({})); throw new Error(res.status === 401 ? 'Invalid API key' : e?.error?.message || `Error ${res.status}`); }
+      }
+      setTestResult(r => ({ ...r, [p.id]: 'ok' }));
+    } catch(e) {
+      setTestResult(r => ({ ...r, [p.id]: e.message }));
+    } finally {
+      setTesting(null);
+    }
+  };
 
   const save = (id) => {
     const k = draft.trim();
@@ -699,9 +733,9 @@ function AIConnectBlock() {
                 </div>
               )}
 
-              {/* Model chip when connected + collapsed */}
+              {/* Model chips + test button when connected + collapsed */}
               {connected && !isExpanded && (
-                <div style={{ padding: '0 22px 14px', display: 'flex', gap: 8 }}>
+                <div style={{ padding: '0 22px 14px', display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
                   {p.models.map(m => (
                     <button key={m.id} onClick={() => selectModel(p.id, m.id)} style={{
                       padding: '5px 12px', borderRadius: 999, cursor: 'pointer',
@@ -711,6 +745,17 @@ function AIConnectBlock() {
                       fontFamily: 'JetBrains Mono, monospace', fontSize: 9.5, letterSpacing: '0.06em',
                     }}>{m.label}</button>
                   ))}
+                  <button onClick={() => testConnection(p)} disabled={testing === p.id} style={{
+                    marginLeft: 4, padding: '5px 12px', borderRadius: 999, cursor: 'pointer',
+                    background: 'transparent', border: '1px solid oklch(0.84 0.025 95)',
+                    fontFamily: 'DM Sans, sans-serif', fontSize: 11.5, color: 'oklch(0.50 0.030 135)',
+                  }}>{testing === p.id ? 'Testing…' : 'Test connection'}</button>
+                  {testResult[p.id] === 'ok' && (
+                    <span style={{ fontSize: 12, color: 'oklch(0.50 0.10 140)', fontFamily: 'DM Sans, sans-serif' }}>✓ Connected</span>
+                  )}
+                  {testResult[p.id] && testResult[p.id] !== 'ok' && (
+                    <span style={{ fontSize: 12, color: 'oklch(0.54 0.14 25)', fontFamily: 'DM Sans, sans-serif' }}>✗ {testResult[p.id]}</span>
+                  )}
                 </div>
               )}
             </div>

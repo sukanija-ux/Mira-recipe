@@ -95,7 +95,7 @@ async function callAI(systemPrompt, history) {
   const msgs = history.map(m => ({ role: m.role, content: m.content }));
 
   if (provider === 'claude') {
-    const model = mods['claude'] || 'claude-haiku-4-5';
+    const model = mods['claude'] || 'claude-3-5-haiku-20241022';
     const res = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
@@ -106,7 +106,13 @@ async function callAI(systemPrompt, history) {
       },
       body: JSON.stringify({ model, max_tokens: 1024, system: systemPrompt, messages: msgs }),
     });
-    if (!res.ok) { const e = await res.json().catch(() => ({})); throw new Error(e?.error?.message || `Claude error ${res.status}`); }
+    if (!res.ok) {
+      const e = await res.json().catch(() => ({}));
+      const msg = e?.error?.message || `Claude error ${res.status}`;
+      if (res.status === 401) throw new Error('Invalid API key. Check your key in Profile → AI model.');
+      if (res.status === 400) throw new Error(`Bad request: ${msg}. Try switching to Claude 3.5 Haiku in Profile → AI model.`);
+      throw new Error(msg);
+    }
     const data = await res.json();
     return data.content[0].text;
   }
@@ -119,7 +125,12 @@ async function callAI(systemPrompt, history) {
     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${key}` },
     body: JSON.stringify({ model, max_tokens: 1024, temperature: 0.7, messages: [{ role: 'system', content: systemPrompt }, ...msgs] }),
   });
-  if (!res.ok) { const e = await res.json().catch(() => ({})); throw new Error(e?.error?.message || `API error ${res.status}`); }
+  if (!res.ok) {
+    const e = await res.json().catch(() => ({}));
+    const msg = e?.error?.message || `API error ${res.status}`;
+    if (res.status === 401) throw new Error('Invalid API key. Check your key in Profile → AI model.');
+    throw new Error(msg);
+  }
   const data = await res.json();
   return data.choices[0].message.content;
 }
