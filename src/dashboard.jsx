@@ -138,8 +138,10 @@ function Dashboard({ profile, go, openRecipe }) {
 
         <div style={{ display: 'grid', gridTemplateColumns: `repeat(${mealsList.length}, 1fr)`, gap: 24 }}>
           {mealsList.map((m, i) => (
-            <article key={m.key} onClick={() => openRecipe(m.r.id)} style={{ cursor: 'pointer', display: 'flex', flexDirection: 'column', gap: 16 }}>
-              <window.ImagePlot src={m.r.imageUrl} label={m.r.title} tone={tones[i % tones.length]} aspect="4/5" round={18} />
+            <article key={m.key} onClick={() => openRecipe(m.r.id)} style={{ cursor: 'pointer', padding: '20px 22px', borderRadius: 18, background: 'oklch(0.97 0.015 90)', border: '1px solid oklch(0.88 0.022 95)' }}
+              onMouseEnter={e => e.currentTarget.style.background = 'white'}
+              onMouseLeave={e => e.currentTarget.style.background = 'oklch(0.97 0.015 90)'}
+            >
               <div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
                   <window.Eyebrow>{m.label} · {m.time}</window.Eyebrow>

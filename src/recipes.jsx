@@ -83,12 +83,14 @@ function RecipeBrowse({ profile, openRecipe }) {
         )}
       </div>
 
-      {/* Editorial 3-col grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 36, rowGap: 56 }}>
+      {/* Recipe list */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 2 }}>
         {list.map((r, i) => (
-          <article key={r.id} onClick={() => openRecipe(r.id)} style={{ cursor: 'pointer' }}>
-            <window.ImagePlot src={r.imageUrl} label={r.title} tone={tones[i % tones.length]} aspect="4/5" round={18} />
-            <div style={{ marginTop: 18 }}>
+          <article key={r.id} onClick={() => openRecipe(r.id)} style={{ cursor: 'pointer', padding: '20px 22px', borderRadius: 14, background: 'oklch(0.97 0.015 90)', border: '1px solid oklch(0.88 0.022 95)', transition: 'background 0.15s' }}
+            onMouseEnter={e => e.currentTarget.style.background = 'white'}
+            onMouseLeave={e => e.currentTarget.style.background = 'oklch(0.97 0.015 90)'}
+          >
+            <div>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
                 <window.Eyebrow>{r.source}</window.Eyebrow>
                 <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 10.5, color: 'oklch(0.54 0.035 135)', letterSpacing: '0.06em' }}>
@@ -163,13 +165,10 @@ function RecipeDetail({ id, profile, go, openRecipe }) {
         </button>
       </div>
 
-      {/* Hero */}
+      {/* Video pill */}
       <div style={{ maxWidth: 1320, margin: '0 auto', padding: '20px 32px 0' }}>
-        <div style={{ position: 'relative', borderRadius: 24, overflow: 'hidden' }}>
-          <window.ImagePlot src={r.imageUrl} label={`${r.title} — ${r.source}`} tone="clay" aspect="21/9" round={24} />
-          {/* Video pill */}
+        <div style={{ position: 'relative' }}>
           <button style={{
-            position: 'absolute', bottom: 24, left: 24,
             background: 'oklch(0.22 0.025 50 / 0.78)', backdropFilter: 'blur(10px)',
             color: 'oklch(0.945 0.022 88)', border: '1px solid oklch(0.96 0.012 75 / 0.2)',
             padding: '10px 18px 10px 14px', borderRadius: 999, cursor: 'pointer',
@@ -178,11 +177,10 @@ function RecipeDetail({ id, profile, go, openRecipe }) {
             <span style={{ width: 22, height: 22, borderRadius: 999, background: 'oklch(0.62 0.11 35)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: 11 }}>▶</span>
             Watch — 3:42
           </button>
-          {/* Phase / meal chips */}
-          <div style={{ position: 'absolute', top: 24, right: 24, display: 'flex', gap: 8 }}>
+          <span style={{ display: 'inline-flex', gap: 8, marginLeft: 16 }}>
             {phaseGood && <window.Badge tone="ink">Perfect for {phase.name}</window.Badge>}
             {r.meal === 'dinner' && <window.Badge tone="ink">Dinner · Zero starch</window.Badge>}
-          </div>
+          </span>
         </div>
       </div>
 
@@ -326,12 +324,9 @@ function RecipeDetail({ id, profile, go, openRecipe }) {
           </h3>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20 }}>
             {window.RECIPES.filter(x => x.id !== r.id).slice(0, 3).map((x, i) => (
-              <window.Card key={x.id} padding={0} hover onClick={() => openRecipe(x.id)} style={{ overflow: 'hidden' }}>
-                <window.ImagePlot src={x.imageUrl} label={x.title} tone={['sage', 'honey', 'plum'][i % 3]} aspect="4/3" round={0} />
-                <div style={{ padding: 18 }}>
-                  <window.Eyebrow>{x.source} · {x.minutes} min</window.Eyebrow>
-                  <h4 style={{ fontFamily: 'Instrument Serif, serif', fontSize: 20, lineHeight: 1.15, color: 'oklch(0.28 0.040 145)', margin: '6px 0 0', fontWeight: 400 }}>{x.title}</h4>
-                </div>
+              <window.Card key={x.id} padding={18} hover onClick={() => openRecipe(x.id)}>
+                <window.Eyebrow>{x.source} · {x.minutes} min</window.Eyebrow>
+                <h4 style={{ fontFamily: 'Instrument Serif, serif', fontSize: 20, lineHeight: 1.15, color: 'oklch(0.28 0.040 145)', margin: '6px 0 0', fontWeight: 400 }}>{x.title}</h4>
               </window.Card>
             ))}
           </div>
