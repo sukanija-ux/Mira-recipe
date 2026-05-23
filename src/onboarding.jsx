@@ -1,6 +1,36 @@
 // 6-step onboarding: Location → Diet → Cuisines → Allergies → Profile → Hormonal profile
 
-const { useState: useState_OB } = React;
+const { useState: useState_OB, useEffect: useEffect_OB } = React;
+
+// Local-buffered text input — only pushes to parent onBlur, prevents focus loss
+function OBInput({ value, onChange, placeholder, style = {} }) {
+  const [local, setLocal] = useState_OB(String(value ?? ''));
+  useEffect_OB(() => setLocal(String(value ?? '')), [value]);
+  return (
+    <input
+      value={local}
+      onChange={e => setLocal(e.target.value)}
+      onBlur={() => onChange(local)}
+      placeholder={placeholder}
+      style={style}
+    />
+  );
+}
+
+// Local-buffered number input
+function OBNumber({ value, onChange, min, max, style = {} }) {
+  const [local, setLocal] = useState_OB(String(value ?? ''));
+  useEffect_OB(() => setLocal(String(value ?? '')), [value]);
+  return (
+    <input
+      type="number" min={min} max={max}
+      value={local}
+      onChange={e => setLocal(e.target.value)}
+      onBlur={() => onChange(local)}
+      style={style}
+    />
+  );
+}
 
 function Onboarding({ profile, setProfile, complete }) {
   const [step, setStep] = useState_OB(0);
@@ -127,7 +157,7 @@ function LocationStep({ profile, setProfile }) {
         </div>
         <div>
           <window.Eyebrow>Postal code</window.Eyebrow>
-          <input value={profile.zip} onChange={(e) => setProfile({ ...profile, zip: e.target.value })}
+          <OBInput value={profile.zip} onChange={v => setProfile({ ...profile, zip: v })}
             placeholder="e.g. 10115"
             style={{
               marginTop: 10, width: '100%', padding: '12px 14px', borderRadius: 10,
@@ -348,9 +378,9 @@ function ProfileStep({ profile, setProfile }) {
       {/* Name */}
       <div>
         <window.Eyebrow>Your name</window.Eyebrow>
-        <input
+        <OBInput
           value={profile.name}
-          onChange={(e) => setProfile({ ...profile, name: e.target.value })}
+          onChange={v => setProfile({ ...profile, name: v })}
           placeholder="e.g. Sofia"
           style={{
             marginTop: 12, width: '100%', padding: '18px 20px', borderRadius: 14,
@@ -371,9 +401,9 @@ function ProfileStep({ profile, setProfile }) {
           <div style={{ padding: '20px 20px', borderRadius: 14, background: 'oklch(0.97 0.018 90)', border: '1px solid oklch(0.84 0.025 95)' }}>
             <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 10, letterSpacing: '0.14em', color: 'oklch(0.54 0.035 135)', textTransform: 'uppercase' }}>Centimetres</div>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginTop: 10 }}>
-              <input
-                type="number" min="140" max="210" value={profile.height}
-                onChange={(e) => setProfile({ ...profile, height: parseInt(e.target.value) || 0 })}
+              <OBNumber
+                value={profile.height} min={140} max={210}
+                onChange={v => setProfile({ ...profile, height: parseInt(v) || 0 })}
                 style={{ width: 90, padding: 0, background: 'transparent', border: 'none', fontFamily: 'Instrument Serif, serif', fontSize: 52, color: 'oklch(0.28 0.040 145)', outline: 'none' }}
               />
               <span style={{ fontFamily: 'Instrument Serif, serif', fontSize: 22, color: 'oklch(0.52 0.035 135)', fontStyle: 'italic' }}>cm</span>
@@ -416,8 +446,8 @@ function CycleStep({ profile, setProfile }) {
           <div style={{ padding: 20, borderRadius: 14, background: 'oklch(0.97 0.018 90)', border: '1px solid oklch(0.84 0.025 95)' }}>
             <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 10, letterSpacing: '0.14em', color: 'oklch(0.54 0.035 135)', textTransform: 'uppercase' }}>Age</div>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, marginTop: 8 }}>
-              <input type="number" min="14" max="80" value={profile.age}
-                onChange={(e) => setProfile({ ...profile, age: parseInt(e.target.value) || 0 })}
+              <OBNumber value={profile.age} min={14} max={80}
+                onChange={v => setProfile({ ...profile, age: parseInt(v) || 0 })}
                 style={{ width: 80, padding: 0, background: 'transparent', border: 'none', fontFamily: 'Instrument Serif, serif', fontSize: 44, color: 'oklch(0.28 0.040 145)', outline: 'none' }} />
               <span style={{ fontFamily: 'Instrument Serif, serif', fontSize: 16, color: 'oklch(0.52 0.035 135)', fontStyle: 'italic' }}>{stage.label.toLowerCase()}</span>
             </div>

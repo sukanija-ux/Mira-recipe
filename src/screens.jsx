@@ -992,10 +992,18 @@ const inputStyle = {
 };
 
 function FieldInput({ label, value, onChange, type = 'text' }) {
+  const [local, setLocal] = useState_S(String(value ?? ''));
+  useEffect_S(() => { setLocal(String(value ?? '')); }, [value]);
   return (
     <label style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
       <window.Eyebrow>{label}</window.Eyebrow>
-      <input type={type} value={value} onChange={e => onChange(e.target.value)} style={inputStyle} />
+      <input
+        type={type}
+        value={local}
+        onChange={e => setLocal(e.target.value)}
+        onBlur={() => onChange(local)}
+        style={inputStyle}
+      />
     </label>
   );
 }
