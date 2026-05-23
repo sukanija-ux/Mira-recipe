@@ -165,23 +165,10 @@ function RecipeDetail({ id, profile, go, openRecipe }) {
         </button>
       </div>
 
-      {/* Video pill */}
-      <div style={{ maxWidth: 1320, margin: '0 auto', padding: '20px 32px 0' }}>
-        <div style={{ position: 'relative' }}>
-          <button style={{
-            background: 'oklch(0.22 0.025 50 / 0.78)', backdropFilter: 'blur(10px)',
-            color: 'oklch(0.945 0.022 88)', border: '1px solid oklch(0.96 0.012 75 / 0.2)',
-            padding: '10px 18px 10px 14px', borderRadius: 999, cursor: 'pointer',
-            fontFamily: 'DM Sans, sans-serif', fontSize: 13, display: 'flex', alignItems: 'center', gap: 10,
-          }}>
-            <span style={{ width: 22, height: 22, borderRadius: 999, background: 'oklch(0.62 0.11 35)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: 11 }}>▶</span>
-            Watch — 3:42
-          </button>
-          <span style={{ display: 'inline-flex', gap: 8, marginLeft: 16 }}>
-            {phaseGood && <window.Badge tone="ink">Perfect for {phase.name}</window.Badge>}
-            {r.meal === 'dinner' && <window.Badge tone="ink">Dinner · Zero starch</window.Badge>}
-          </span>
-        </div>
+      {/* Phase badges */}
+      <div style={{ maxWidth: 1320, margin: '0 auto', padding: '20px 32px 0', display: 'flex', gap: 8 }}>
+        {phaseGood && <window.Badge tone="ink">Perfect for {phase.name}</window.Badge>}
+        {r.meal === 'dinner' && <window.Badge tone="ink">Dinner · Zero starch</window.Badge>}
       </div>
 
       {/* Title block */}
