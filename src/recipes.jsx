@@ -2,22 +2,37 @@
 
 const { useState: useState_R, useMemo: useMemo_R } = React;
 
-// Recipe library with phase + meal filters
+// Recipe library with phase + meal + conditions filters
 function RecipeBrowse({ profile, openRecipe }) {
   const phase   = window.phaseForDay(profile.day, profile.length);
-  // Default to showing recipes for the current phase
-  const [filter,  setFilter]  = useState_R('phase');
-  const [meal,    setMeal]    = useState_R('all');
-  const [cuisine, setCuisine] = useState_R('all');
+  const [filter,     setFilter]     = useState_R('phase');
+  const [meal,       setMeal]       = useState_R('all');
+  const [cuisine,    setCuisine]    = useState_R('all');
+  const [condFilter, setCondFilter] = useState_R('all');
+
+  // Collect all boosted tags from user's conditions
+  const conditionTags = useMemo_R(() => {
+    const conditions = profile.conditions || [];
+    const tags = new Set();
+    (window.HEALTH_CONDITIONS || []).forEach(c => {
+      if (conditions.includes(c.id)) c.tagBoost.forEach(t => tags.add(t));
+    });
+    return tags;
+  }, [profile.conditions]);
 
   const list = useMemo_R(() => {
     return window.RECIPES.filter(r => {
       if (filter === 'phase' && !r.phases.includes(phase.id)) return false;
-      if (meal !== 'all' && r.meal !== meal) return false;
+      const meals = Array.isArray(r.meal) ? r.meal : [r.meal];
+      if (meal !== 'all' && !meals.includes(meal)) return false;
       if (cuisine !== 'all' && r.cuisine !== cuisine) return false;
+      if (condFilter === 'conditions' && conditionTags.size > 0) {
+        const matched = r.tags.some(t => conditionTags.has(t));
+        if (!matched) return false;
+      }
       return true;
     });
-  }, [filter, meal, cuisine, phase.id]);
+  }, [filter, meal, cuisine, condFilter, conditionTags, phase.id]);
 
   const tones = ['clay', 'sage', 'honey', 'plum', 'paper', 'clay'];
 
@@ -45,12 +60,27 @@ function RecipeBrowse({ profile, openRecipe }) {
           ))}
         </div>
         {/* Row 2: Cuisine */}
-        <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap', marginBottom: (profile.conditions || []).length > 0 ? 10 : 0 }}>
           <FilterPill active={cuisine === 'all'} onClick={() => setCuisine('all')}>All cuisines</FilterPill>
           {window.RECIPE_CUISINE_FILTERS.map(c => (
             <FilterPill key={c.id} active={cuisine === c.id} onClick={() => setCuisine(c.id)}>{c.label}</FilterPill>
           ))}
         </div>
+        {/* Row 3: Conditions filter — only shown if user has conditions set */}
+        {(profile.conditions || []).length > 0 && (
+          <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap', paddingTop: 10, borderTop: '1px dashed oklch(0.88 0.025 95)' }}>
+            <FilterPill active={condFilter === 'all'} onClick={() => setCondFilter('all')}>All recipes</FilterPill>
+            <FilterPill active={condFilter === 'conditions'} color={condFilter === 'conditions' ? 'oklch(0.58 0.09 140)' : null} onClick={() => setCondFilter('conditions')}>
+              ✦ For your conditions
+            </FilterPill>
+            <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 10, color: 'oklch(0.60 0.035 135)', letterSpacing: '0.06em' }}>
+              {(profile.conditions || []).map(cid => {
+                const c = (window.HEALTH_CONDITIONS || []).find(x => x.id === cid);
+                return c ? c.label : '';
+              }).filter(Boolean).join(' · ')}
+            </span>
+          </div>
+        )}
       </div>
 
       {/* Editorial 3-col grid */}

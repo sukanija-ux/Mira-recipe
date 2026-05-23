@@ -73,7 +73,7 @@ function Dashboard({ profile, go, openRecipe }) {
       </section>
 
       {/* Gut & Ayurvedic focus for today's phase */}
-      <section style={{ marginBottom: 64, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
+      <section style={{ marginBottom: 32, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
         <div style={{ padding: 28, borderRadius: 18, background: phase.soft, border: `1px solid ${phase.color}30` }}>
           <window.Eyebrow color={phase.color}>Gut focus · {phase.name}</window.Eyebrow>
           <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 14.5, lineHeight: 1.65, color: 'oklch(0.34 0.035 140)', margin: '12px 0 0' }}>
@@ -87,6 +87,43 @@ function Dashboard({ profile, go, openRecipe }) {
           </p>
         </div>
       </section>
+
+      {/* Movement card */}
+      {phase.movement && (
+        <section style={{ marginBottom: 64 }}>
+          <div style={{ padding: '28px 32px', borderRadius: 18, background: 'oklch(0.97 0.018 90)', border: '1px solid oklch(0.86 0.025 95)', display: 'grid', gridTemplateColumns: '1fr auto', gap: 32, alignItems: 'start' }}>
+            <div>
+              <window.Eyebrow>Today's movement · {phase.name} phase</window.Eyebrow>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 14 }}>
+                {phase.movement.best.map(m => (
+                  <span key={m} style={{
+                    padding: '7px 14px', borderRadius: 999,
+                    background: phase.soft, border: `1px solid ${phase.color}35`,
+                    fontFamily: 'DM Sans, sans-serif', fontSize: 13.5, fontWeight: 500,
+                    color: 'oklch(0.32 0.04 140)',
+                  }}>{m}</span>
+                ))}
+              </div>
+              <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 13.5, lineHeight: 1.65, color: 'oklch(0.44 0.035 140)', margin: '14px 0 0', maxWidth: 680 }}>
+                {phase.movement.note}
+              </p>
+              {phase.movement.avoid.length > 0 && (
+                <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 10.5, color: 'oklch(0.54 0.035 135)', marginTop: 10, letterSpacing: '0.05em' }}>
+                  EASE OFF · {phase.movement.avoid.join(' · ')}
+                </p>
+              )}
+            </div>
+            <div style={{ textAlign: 'right', flexShrink: 0 }}>
+              <div style={{ fontFamily: 'Instrument Serif, serif', fontSize: 48, color: phase.color, lineHeight: 1, fontWeight: 400 }}>
+                {phase.movement.intensity}
+              </div>
+              <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 10, color: 'oklch(0.54 0.035 135)', marginTop: 6, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+                {phase.movement.duration}
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Today's plan */}
       <section style={{ marginBottom: 80 }}>
@@ -141,8 +178,8 @@ function Dashboard({ profile, go, openRecipe }) {
           </div>
         </div>
         <div style={{ textAlign: 'right' }}>
-          <button onClick={() => go('shop')} style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'DM Sans, sans-serif', fontSize: 14, color: 'oklch(0.50 0.035 135)' }}>
-            Shopping list →
+          <button onClick={() => go('profile')} style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'DM Sans, sans-serif', fontSize: 14, color: 'oklch(0.50 0.035 135)' }}>
+            Your profile →
           </button>
         </div>
       </section>

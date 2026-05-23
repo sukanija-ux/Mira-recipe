@@ -573,6 +573,34 @@ function Profile({ profile, setProfile, go }) {
         </div>
       </Block>
 
+      <Block title="Health conditions">
+        <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 13, color: 'oklch(0.52 0.035 135)', lineHeight: 1.55, margin: '0 0 14px' }}>
+          Select any that apply — recipes and coach advice will be tailored to your needs.
+        </p>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+          {(window.HEALTH_CONDITIONS || []).map(c => {
+            const on = (profile.conditions || []).includes(c.id);
+            return (
+              <button key={c.id} onClick={() => {
+                const cur = profile.conditions || [];
+                setProfile({ ...profile, conditions: on ? cur.filter(x => x !== c.id) : [...cur, c.id] });
+              }} style={{
+                padding: '14px 16px', borderRadius: 14, textAlign: 'left',
+                background: on ? 'oklch(0.28 0.040 145)' : 'oklch(0.945 0.022 88)',
+                border: on ? '1px solid oklch(0.28 0.040 145)' : '1px solid oklch(0.84 0.025 95)',
+                cursor: 'pointer', display: 'flex', alignItems: 'flex-start', gap: 12,
+              }}>
+                <span style={{ fontSize: 18, lineHeight: 1.2, flexShrink: 0, color: on ? 'oklch(0.80 0.06 88)' : 'oklch(0.56 0.035 135)' }}>{c.icon}</span>
+                <div>
+                  <div style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 13.5, fontWeight: 600, color: on ? 'oklch(0.945 0.022 88)' : 'oklch(0.28 0.040 145)' }}>{c.label}</div>
+                  <div style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 12, color: on ? 'oklch(0.74 0.025 90)' : 'oklch(0.54 0.035 135)', marginTop: 3 }}>{c.description}</div>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      </Block>
+
       <Block title="Exclusions">
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
           {window.ALLERGENS.map(a => {

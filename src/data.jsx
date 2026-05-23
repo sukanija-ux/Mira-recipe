@@ -16,6 +16,13 @@ const PHASES = [
     avoid: ['Raw salads', 'Cold drinks', 'Dry crackers', 'Cruciferous raw veg'],
     carbState: 'Moderate, clean, comforting carbs allowed at breakfast & lunch.',
     seed: '1 tbsp ground flax + 1 tbsp pumpkin',
+    movement: {
+      best: ['Gentle yoga', 'Walking', 'Restorative stretching', 'Yin yoga'],
+      avoid: ['HIIT', 'Heavy lifting', 'Intense cardio'],
+      intensity: 'Low',
+      duration: '20–30 min',
+      note: 'Blood loss and low iron reduce oxygen-carrying capacity. Light movement improves circulation and eases cramps without depleting reserves. Listen to your body — rest is valid.',
+    },
   },
   {
     id: 'follicular',
@@ -32,6 +39,13 @@ const PHASES = [
     avoid: ['Heavy, oily foods', 'Excess dairy', 'Refined grains'],
     carbState: 'Highest tolerance for vibrant, clean complex carbs.',
     seed: '1 tbsp ground flax + 1 tbsp pumpkin',
+    movement: {
+      best: ['Strength training', 'Running', 'HIIT', 'Cycling', 'Dance'],
+      avoid: ['Forced rest if you feel energised'],
+      intensity: 'High',
+      duration: '45–60 min',
+      note: 'Rising estrogen boosts strength, coordination and pain tolerance. Muscle protein synthesis is enhanced — lift heavier, run further. The best time to set personal records.',
+    },
   },
   {
     id: 'ovulatory',
@@ -48,6 +62,13 @@ const PHASES = [
     avoid: ['Overly spicy foods', 'Excess heat', 'Alcohol'],
     carbState: 'Moderate carbs at breakfast & lunch.',
     seed: '1 tbsp sesame + 1 tbsp sunflower',
+    movement: {
+      best: ['Team sports', 'Group fitness', 'Spin class', 'Swimming', 'Intense cardio'],
+      avoid: ['Overheating — cool down well'],
+      intensity: 'High',
+      duration: '45–60 min',
+      note: 'Peak energy, coordination and social drive. Estrogen is highest — enjoy competition and group energy. Warm up carefully: ligament laxity increases at ovulation, raising injury risk.',
+    },
   },
   {
     id: 'luteal',
@@ -64,6 +85,13 @@ const PHASES = [
     avoid: ['Refined sugar', 'Late-night carbs', 'Aggressive restriction', 'Raw cold foods'],
     carbState: 'Complex, high-fiber, slow-burning carbs at breakfast & lunch (squash, quinoa, legumes).',
     seed: '1 tbsp sesame + 1 tbsp sunflower',
+    movement: {
+      best: ['Pilates', 'Yoga', 'Swimming', 'Light weights', 'Long walks'],
+      avoid: ['Pushing through PMS fatigue', 'Extreme HIIT'],
+      intensity: 'Low–Moderate',
+      duration: '30–45 min',
+      note: 'Progesterone raises core temperature and slows recovery. Focus on skill, form, and flexibility. Exercise still critically improves insulin sensitivity and reduces PMS — just match intensity to your energy.',
+    },
   },
 ];
 
@@ -1964,6 +1992,74 @@ const TAG_STYLES = {
 
 const tagStyle = (tag) => TAG_STYLES[tag] || { bg: 'oklch(0.93 0.022 90)', fg: 'oklch(0.34 0.035 140)', bd: 'oklch(0.84 0.025 95)' };
 
+// ─── Health Conditions ────────────────────────────────────────────────────────
+const HEALTH_CONDITIONS = [
+  {
+    id: 'insulin-resistance',
+    label: 'Insulin Resistance',
+    icon: '◈',
+    description: 'IR / pre-diabetes / blood sugar dysregulation',
+    tagBoost: ['Protein-forward', 'Glucose-blunted', 'Zero starch', 'Gluten-free'],
+    coachNote: 'User has insulin resistance (IR). Prioritise protein-first eating, 4–6h meal gaps, and avoiding refined carbs. Highlight low-GI, high-fiber, high-protein meals.',
+  },
+  {
+    id: 'pcos',
+    label: 'PCOS',
+    icon: '◎',
+    description: 'Polycystic ovary syndrome',
+    tagBoost: ['Gluten-free', 'Gut-healing', 'Protein-forward', 'Vegan', 'Antioxidant'],
+    coachNote: 'User has PCOS. Focus on anti-androgenic foods (spearmint, flaxseed), blood sugar stabilisation, and anti-inflammatory eating. Inositol-rich foods (chickpeas, lentils) are particularly supportive.',
+  },
+  {
+    id: 'anemia',
+    label: 'Anemia',
+    icon: '◑',
+    description: 'Iron-deficiency / low ferritin',
+    tagBoost: ['Gut-healing', 'Estrobolome', 'Warming'],
+    coachNote: 'User has iron-deficiency anemia or low ferritin. Prioritise heme and non-heme iron-rich foods, always paired with vitamin C to enhance absorption. Avoid tea/coffee with meals. Mention leafy greens, lentils, red meat, pumpkin seeds.',
+  },
+  {
+    id: 'hypothyroidism',
+    label: 'Hypothyroidism / Hashimoto\'s',
+    icon: '◇',
+    description: 'Underactive thyroid or autoimmune thyroiditis',
+    tagBoost: ['Gluten-free', 'Warming', 'Ayurvedic-spiced', 'Antioxidant'],
+    coachNote: 'User has hypothyroidism or Hashimoto\'s. Prioritise selenium-rich foods (Brazil nuts, salmon), iodine (seaweed, fish), zinc (pumpkin seeds), and gluten-free options. Avoid raw cruciferous veg in large amounts (cook them). Anti-inflammatory focus.',
+  },
+  {
+    id: 'endometriosis',
+    label: 'Endometriosis',
+    icon: '◐',
+    description: 'Endo / adenomyosis',
+    tagBoost: ['Antioxidant', 'Gut-healing', 'Gluten-free', 'Vegan'],
+    coachNote: 'User has endometriosis. Strongly anti-inflammatory diet focus: omega-3 rich fish, cruciferous veg, turmeric, ginger. Avoid red meat, dairy, refined sugar, and trans fats. Gluten-free may reduce systemic inflammation. Magnesium for pain.',
+  },
+  {
+    id: 'perimenopause',
+    label: 'Perimenopause / Menopause',
+    icon: '◌',
+    description: 'Hormonal transition',
+    tagBoost: ['Estrobolome', 'Probiotic', 'Protein-forward', 'Magnesium-rich'],
+    coachNote: 'User is in perimenopause or menopause. Emphasise phytoestrogens (flaxseed, soy, legumes), calcium and vitamin D for bone density, protein for muscle preservation, and magnesium for sleep. Estrobolome health is critical.',
+  },
+  {
+    id: 'anxiety',
+    label: 'Hormonal Anxiety / Mood',
+    icon: '◒',
+    description: 'PMS anxiety, HPA dysregulation, low mood',
+    tagBoost: ['Magnesium-rich', 'Gut-healing', 'Ayurvedic-spiced', 'Probiotic'],
+    coachNote: 'User experiences hormonal anxiety or mood dysregulation. Highlight magnesium-rich foods (spinach, pumpkin seeds, dark chocolate), L-theanine, ashwagandha-compatible meals, and gut-brain axis foods. Serotonin precursors: tryptophan-rich meals (turkey, eggs, legumes).',
+  },
+  {
+    id: 'bloating',
+    label: 'Bloating / Digestive Sensitivity',
+    icon: '◍',
+    description: 'IBS, SIBO, or chronic bloating',
+    tagBoost: ['Low-FODMAP', 'Gut-healing', 'Probiotic', 'Fermented'],
+    coachNote: 'User has bloating, IBS or digestive sensitivity. Prioritise low-FODMAP options, cooked rather than raw veg, and gentle prebiotic progression. Avoid onion, garlic (or use garlic-infused oil), beans in large quantities. Ginger and peppermint teas are supportive.',
+  },
+];
+
 // Primary display tags shown on cards (exclude noisy ones)
 const CARD_TAGS = ['Gut-healing', 'Ayurvedic-spiced', 'Seasonal', 'Probiotic', 'Fermented', 'Zero starch', 'Gluten-free', 'Low-FODMAP', 'Vegan', 'Vegetarian', 'Magnesium-rich', 'Antioxidant', 'Cooling', 'Warming'];
 
@@ -1975,4 +2071,5 @@ Object.assign(window, {
   brandFor, bestStoreFor,
   TAG_STYLES, tagStyle, CARD_TAGS,
   RECIPE_CUISINE_FILTERS,
+  HEALTH_CONDITIONS,
 });

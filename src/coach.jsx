@@ -1,4 +1,4 @@
-// Health Snapshot + Gemini-powered Health Coach
+// Health Snapshot + Groq-powered Health Coach (Llama 3.1 — free & open-source)
 
 const { useState: useState_C, useEffect: useEffect_C, useRef: useRef_C } = React;
 
@@ -85,53 +85,76 @@ function HealthSnapshot({ profile }) {
 
 // ─── Health Coach ─────────────────────────────────────────────────────────────
 
-// OpenAI API key — replace with your key from platform.openai.com
-const OPENAI_KEY = 'sk-proj-REPLACE_WITH_YOUR_OPENAI_KEY';
-const OPENAI_URL = 'https://api.openai.com/v1/chat/completions';
+const GROQ_URL   = 'https://api.groq.com/openai/v1/chat/completions';
+const GROQ_MODEL = 'llama-3.1-8b-instant';
+const STORAGE_KEY = 'mira_groq_key';
 
 function HealthCoach({ profile }) {
   const phase         = window.phaseForDay(profile.day, profile.length);
   const proteinTarget = Math.round((profile.height - 100) * 1.5);
   const perMeal       = Math.round(proteinTarget / profile.meals);
 
-  const [messages, setMessages] = useState_C([]);
-  const [input,    setInput]    = useState_C('');
-  const [loading,  setLoading]  = useState_C(false);
-  const [error,    setError]    = useState_C('');
+  const [messages,  setMessages]  = useState_C([]);
+  const [input,     setInput]     = useState_C('');
+  const [loading,   setLoading]   = useState_C(false);
+  const [error,     setError]     = useState_C('');
+  const [apiKey,    setApiKey]    = useState_C(() => localStorage.getItem(STORAGE_KEY) || '');
+  const [showKey,   setShowKey]   = useState_C(false);
+  const [keyDraft,  setKeyDraft]  = useState_C('');
   const endRef = useRef_C(null);
 
   useEffect_C(() => {
     if (messages.length) endRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
+  const hasKey = apiKey.startsWith('gsk_');
+
+  const saveKey = () => {
+    const k = keyDraft.trim();
+    localStorage.setItem(STORAGE_KEY, k);
+    setApiKey(k);
+    setShowKey(false);
+    setKeyDraft('');
+    setError('');
+  };
+
+  // Build conditions context
+  const conditionNotes = (profile.conditions || []).map(cid => {
+    const c = (window.HEALTH_CONDITIONS || []).find(x => x.id === cid);
+    return c ? c.coachNote : '';
+  }).filter(Boolean);
+
   const systemPrompt = `You are Mira, a warm, evidence-based hormonal health and insulin resistance (IR) nutrition coach. You speak with calm authority and genuine empathy — like a knowledgeable friend who has read the research.
 
 User profile:
 - Name: ${profile.name}, Age: ${profile.age}, Height: ${profile.height}cm
 - Cycle: Day ${profile.day} of ${profile.length} — currently in the **${phase.name} phase** (${phase.headline})
-- IR protocol: ${proteinTarget}g protein/day · ${perMeal}g per meal · ${profile.meals} meals/day · 4–6h meal gaps · MMC gut-clearing activates after 4h fasting
-- Diet framework: ${profile.diet} · Preferred cuisines: ${profile.cuisines.join(', ')}
-- Exclusions: ${profile.allergies.length ? profile.allergies.join(', ') : 'none'}
+- IR protocol: ${proteinTarget}g protein/day · ${perMeal}g per meal · ${profile.meals} meals/day · 4–6h meal gaps
+- Diet framework: ${profile.diet} · Preferred cuisines: ${(profile.cuisines || []).join(', ')}
+- Exclusions: ${(profile.allergies || []).length ? profile.allergies.join(', ') : 'none'}
+${conditionNotes.length ? `\nHealth conditions to factor in:\n${conditionNotes.map(n => '- ' + n).join('\n')}` : ''}
 
 Current phase guidance (${phase.name} — Days ${phase.range[0]}–${phase.range[1]}):
-- What's happening hormonally: ${phase.body}
-- Gut & microbiome focus: ${phase.gutFocus}
+- Hormonally: ${phase.body}
+- Gut focus: ${phase.gutFocus}
 - Ayurvedic lens (${phase.dosha}): ${phase.ayurvedicFocus}
-- Prioritise eating: ${phase.needs.join(', ')}
-- Minimise / avoid: ${phase.avoid.join(', ')}
-- Seed cycling today: ${phase.seed}
+- Prioritise: ${phase.needs.join(', ')}
+- Minimise: ${phase.avoid.join(', ')}
+- Seed cycling: ${phase.seed}
+- Exercise today: ${phase.movement ? phase.movement.best.join(', ') + ' (' + phase.movement.intensity + ' intensity)' : ''}
 
 Coaching principles:
-- Keep answers concise — 2–4 short paragraphs unless the user asks to go deeper.
-- Always connect advice to the user's current cycle phase and IR context.
+- Keep answers concise — 2–4 short paragraphs unless asked to go deeper.
+- Always connect advice to the user's current cycle phase, IR context, and any stated health conditions.
 - Reference IR principles: protein-first meals, 4–6h gaps, no snacking, MMC gut-clearing window.
 - Mention estrobolome and plant diversity (30 plants/week) where relevant.
-- Seed cycling: flax + pumpkin D1–13 (follicular half), sesame + sunflower D14–28 (luteal half).
+- Seed cycling: flax + pumpkin D1–13, sesame + sunflower D14–28.
 - Never diagnose or prescribe. For medical concerns, recommend their GP or a hormone specialist.
 - If the user writes in a language other than English, respond in that language.`;
 
   const send = async () => {
     if (!input.trim() || loading) return;
+    if (!hasKey) { setShowKey(true); setError('Add your free Groq key below to enable the coach.'); return; }
 
     const userMsg = { role: 'user', content: input.trim() };
     const history = [...messages, userMsg];
@@ -141,14 +164,14 @@ Coaching principles:
     setError('');
 
     try {
-      const res = await fetch(OPENAI_URL, {
+      const res = await fetch(GROQ_URL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${OPENAI_KEY}`,
+          'Authorization': `Bearer ${apiKey}`,
         },
         body: JSON.stringify({
-          model: 'gpt-4o-mini',
+          model: GROQ_MODEL,
           max_tokens: 1024,
           temperature: 0.7,
           messages: [
@@ -160,7 +183,9 @@ Coaching principles:
 
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
-        throw new Error(err?.error?.message || `API error ${res.status}`);
+        const msg = err?.error?.message || `API error ${res.status}`;
+        if (res.status === 401) { setApiKey(''); localStorage.removeItem(STORAGE_KEY); }
+        throw new Error(msg);
       }
       const data  = await res.json();
       const reply = data.choices?.[0]?.message?.content || '';
@@ -176,21 +201,60 @@ Coaching principles:
     `What should I eat today for the ${phase.name.toLowerCase()} phase?`,
     `How do I hit ${proteinTarget}g protein across ${profile.meals} meals?`,
     'Which gut-healing foods should I focus on this week?',
-    'Explain seed cycling and why it matters.',
+    ...(profile.conditions?.length ? [`How do I eat for my ${(profile.conditions || []).map(c => { const x = (window.HEALTH_CONDITIONS||[]).find(h=>h.id===c); return x ? x.label : c; }).join(' & ')}?`] : ['Explain seed cycling and why it matters.']),
   ];
 
   return (
     <section style={{ marginBottom: 56, padding: '32px 36px', borderRadius: 24, background: 'oklch(0.97 0.018 90)', border: '1px solid oklch(0.86 0.025 95)' }}>
       {/* Header */}
       <div style={{ marginBottom: 22 }}>
-        <window.Eyebrow color={phase.color}>Health Coach · Powered by GPT-4o</window.Eyebrow>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+          <window.Eyebrow color={phase.color}>Health Coach · Llama 3.1 (Groq)</window.Eyebrow>
+          <button onClick={() => { setShowKey(!showKey); setKeyDraft(apiKey); }} style={{
+            background: hasKey ? 'oklch(0.91 0.04 140)' : 'oklch(0.94 0.04 35)',
+            border: hasKey ? '1px solid oklch(0.78 0.07 140)' : '1px solid oklch(0.80 0.08 35)',
+            borderRadius: 999, padding: '4px 12px', cursor: 'pointer',
+            fontFamily: 'JetBrains Mono, monospace', fontSize: 10, letterSpacing: '0.06em',
+            color: hasKey ? 'oklch(0.36 0.08 140)' : 'oklch(0.44 0.10 35)',
+          }}>
+            {hasKey ? '● KEY ACTIVE' : '○ ADD KEY'}
+          </button>
+        </div>
         <h2 style={{ fontFamily: 'Instrument Serif, serif', fontSize: 36, fontWeight: 400, color: 'oklch(0.28 0.040 145)', margin: '10px 0 5px' }}>
           Ask <em style={{ color: phase.color }}>anything</em> about your cycle & nutrition.
         </h2>
         <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 13, color: 'oklch(0.52 0.035 135)', lineHeight: 1.5 }}>
-          Knows your {phase.name} phase, IR targets, gut focus, and today's seed cycling. Conversations stay in your browser.
+          Powered by Llama 3.1 (open-source) via Groq. Knows your {phase.name} phase, IR targets{profile.conditions?.length ? ', your health conditions' : ''}, and seed cycling. Conversations stay in your browser.
         </p>
       </div>
+
+      {/* API key setup panel */}
+      {showKey && (
+        <div style={{ marginBottom: 22, padding: '20px 22px', borderRadius: 14, background: 'oklch(0.945 0.022 88)', border: '1px solid oklch(0.84 0.025 95)' }}>
+          <window.Eyebrow>Groq API Key (free)</window.Eyebrow>
+          <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 13, color: 'oklch(0.46 0.035 135)', margin: '6px 0 14px', lineHeight: 1.55 }}>
+            1. Sign up free at <strong>console.groq.com</strong> — no credit card needed.<br />
+            2. Create an API key and paste it here. It's saved only in your browser.
+          </p>
+          <div style={{ display: 'flex', gap: 10 }}>
+            <input
+              type="password"
+              value={keyDraft}
+              onChange={e => setKeyDraft(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && saveKey()}
+              placeholder="gsk_..."
+              style={{
+                flex: 1, padding: '10px 14px', borderRadius: 10,
+                border: '1px solid oklch(0.82 0.025 95)',
+                background: 'white', fontFamily: 'JetBrains Mono, monospace',
+                fontSize: 13, color: 'oklch(0.28 0.040 145)', outline: 'none',
+              }}
+            />
+            <window.Button onClick={saveKey} variant="primary" size="sm">Save key</window.Button>
+            <window.Button onClick={() => setShowKey(false)} variant="ghost" size="sm">Cancel</window.Button>
+          </div>
+        </div>
+      )}
 
       {/* Message thread */}
       {messages.length > 0 && (
@@ -220,7 +284,6 @@ Coaching principles:
             </div>
           ))}
 
-          {/* Loading dots */}
           {loading && (
             <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
               <div style={{ width: 30, height: 30, borderRadius: 999, background: phase.soft, border: `1px solid ${phase.color}50`, flexShrink: 0 }} />
@@ -232,7 +295,6 @@ Coaching principles:
             </div>
           )}
 
-          {/* Inline error */}
           {error && (
             <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 12.5, color: 'oklch(0.58 0.14 35)', paddingLeft: 40 }}>
               ⚠ {error}
@@ -242,20 +304,23 @@ Coaching principles:
         </div>
       )}
 
-      {/* Suggestion chips — shown only when no messages yet */}
+      {/* Error when no key */}
+      {!hasKey && !showKey && error && (
+        <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 13, color: 'oklch(0.54 0.12 35)', marginBottom: 14, padding: '10px 14px', borderRadius: 10, background: 'oklch(0.96 0.03 35)', border: '1px solid oklch(0.88 0.06 35)' }}>
+          ⚠ {error}
+        </p>
+      )}
+
+      {/* Suggestion chips */}
       {messages.length === 0 && (
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 18 }}>
           {suggestions.map(s => (
-            <button
-              key={s}
-              onClick={() => setInput(s)}
-              style={{
-                padding: '8px 13px', borderRadius: 999,
-                background: phase.soft, border: `1px solid ${phase.color}35`,
-                cursor: 'pointer', fontFamily: 'DM Sans, sans-serif', fontSize: 13,
-                color: 'oklch(0.38 0.035 140)',
-              }}
-            >
+            <button key={s} onClick={() => setInput(s)} style={{
+              padding: '8px 13px', borderRadius: 999,
+              background: phase.soft, border: `1px solid ${phase.color}35`,
+              cursor: 'pointer', fontFamily: 'DM Sans, sans-serif', fontSize: 13,
+              color: 'oklch(0.38 0.035 140)',
+            }}>
               {s}
             </button>
           ))}
@@ -268,7 +333,7 @@ Coaching principles:
           value={input}
           onChange={e => setInput(e.target.value)}
           onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } }}
-          placeholder={`Ask about your ${phase.name.toLowerCase()} phase, IR meals, or gut health…`}
+          placeholder={hasKey ? `Ask about your ${phase.name.toLowerCase()} phase, IR meals, or gut health…` : 'Add your free Groq key (↑ button above) to start chatting…'}
           rows={2}
           style={{
             flex: 1, padding: '12px 15px', borderRadius: 12,
@@ -284,7 +349,7 @@ Coaching principles:
         </window.Button>
       </div>
       <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 9, color: 'oklch(0.64 0.020 130)', letterSpacing: '0.09em', marginTop: 8, textTransform: 'uppercase' }}>
-        Enter to send · Shift+Enter for line break · Not a substitute for medical advice
+        Enter to send · Shift+Enter for line break · Free Groq key · Not medical advice
       </div>
     </section>
   );

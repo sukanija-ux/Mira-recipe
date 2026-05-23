@@ -29,6 +29,7 @@ function App() {
     age:       34,
     ethnicity: 'european',
     irregular: false,
+    conditions: [],            // health conditions: 'pcos', 'insulin-resistance', 'anemia', etc.
     trackingMode:   'cycle',   // 'cycle' | 'pregnant' | 'postpartum' | 'menopause'
     pregnancyWeek:  12,
     postpartumWeek: 6,
