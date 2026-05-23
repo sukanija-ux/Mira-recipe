@@ -83,10 +83,48 @@ function HealthSnapshot({ profile }) {
   );
 }
 
-// ─── Health Coach ─────────────────────────────────────────────────────────────
+// ─── AI routing helper ────────────────────────────────────────────────────────
+async function callAI(systemPrompt, history) {
+  const provider = localStorage.getItem('mira_ai_provider') || 'claude';
+  let keys = {}; try { keys = JSON.parse(localStorage.getItem('mira_ai_keys') || '{}'); } catch {}
+  let mods = {}; try { mods = JSON.parse(localStorage.getItem('mira_ai_models') || '{}'); } catch {}
+  const key = keys[provider] || '';
 
-const AI_URL   = 'https://text.pollinations.ai/openai';
-const AI_MODEL = 'openai';  // free, no key required
+  if (!key) throw new Error('NO_KEY');
+
+  const msgs = history.map(m => ({ role: m.role, content: m.content }));
+
+  if (provider === 'claude') {
+    const model = mods['claude'] || 'claude-haiku-4-5';
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': key,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true',
+      },
+      body: JSON.stringify({ model, max_tokens: 1024, system: systemPrompt, messages: msgs }),
+    });
+    if (!res.ok) { const e = await res.json().catch(() => ({})); throw new Error(e?.error?.message || `Claude error ${res.status}`); }
+    const data = await res.json();
+    return data.content[0].text;
+  }
+
+  // OpenAI-compatible: openai or groq
+  const url   = provider === 'openai' ? 'https://api.openai.com/v1/chat/completions' : 'https://api.groq.com/openai/v1/chat/completions';
+  const model = mods[provider] || (provider === 'openai' ? 'gpt-4o-mini' : 'llama-3.1-8b-instant');
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${key}` },
+    body: JSON.stringify({ model, max_tokens: 1024, temperature: 0.7, messages: [{ role: 'system', content: systemPrompt }, ...msgs] }),
+  });
+  if (!res.ok) { const e = await res.json().catch(() => ({})); throw new Error(e?.error?.message || `API error ${res.status}`); }
+  const data = await res.json();
+  return data.choices[0].message.content;
+}
+
+// ─── Health Coach ─────────────────────────────────────────────────────────────
 
 function HealthCoach({ profile }) {
   const phase         = window.phaseForDay(profile.day, profile.length);
@@ -97,11 +135,19 @@ function HealthCoach({ profile }) {
   const [input,     setInput]     = useState_C('');
   const [loading,   setLoading]   = useState_C(false);
   const [error,     setError]     = useState_C('');
+  // Re-read active provider for display
+  const [provider, setProvider]   = useState_C(() => localStorage.getItem('mira_ai_provider') || 'claude');
   const endRef = useRef_C(null);
 
   useEffect_C(() => {
     if (messages.length) endRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
+
+  // Refresh provider label when component re-mounts
+  useEffect_C(() => {
+    const p = localStorage.getItem('mira_ai_provider') || 'claude';
+    setProvider(p);
+  }, []);
 
   // Build conditions context
   const conditionNotes = (profile.conditions || []).map(cid => {
@@ -148,29 +194,14 @@ Coaching principles:
     setError('');
 
     try {
-      const res = await fetch(AI_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model: AI_MODEL,
-          max_tokens: 1024,
-          temperature: 0.7,
-          messages: [
-            { role: 'system', content: systemPrompt },
-            ...history.map(m => ({ role: m.role, content: m.content })),
-          ],
-        }),
-      });
-
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error(err?.error?.message || `Error ${res.status} — please try again.`);
-      }
-      const data  = await res.json();
-      const reply = data.choices?.[0]?.message?.content || '';
+      const reply = await callAI(systemPrompt, history);
       setMessages([...history, { role: 'assistant', content: reply }]);
     } catch (e) {
-      setError(e.message);
+      if (e.message === 'NO_KEY') {
+        setError('No AI model connected. Go to Profile → AI model to connect Claude, GPT-4o, or Llama.');
+      } else {
+        setError(e.message);
+      }
     } finally {
       setLoading(false);
     }
@@ -188,7 +219,9 @@ Coaching principles:
       {/* Header */}
       <div style={{ marginBottom: 22 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-          <window.Eyebrow color={phase.color}>Health Coach · AI-powered · Free</window.Eyebrow>
+          <window.Eyebrow color={phase.color}>
+            Health Coach · {provider === 'claude' ? 'Claude' : provider === 'openai' ? 'GPT-4o' : 'Llama 3'}
+          </window.Eyebrow>
         </div>
         <h2 style={{ fontFamily: 'Instrument Serif, serif', fontSize: 36, fontWeight: 400, color: 'oklch(0.28 0.040 145)', margin: '10px 0 5px' }}>
           Ask <em style={{ color: phase.color }}>anything</em> about your cycle & nutrition.
