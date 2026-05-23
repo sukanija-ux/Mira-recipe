@@ -83,8 +83,7 @@ function App() {
       {route === 'browse'  && <window.RecipeBrowse  profile={profile} openRecipe={openRecipe} />}
       {route === 'recipe'  && recipeId && <window.RecipeDetail id={recipeId} profile={profile} go={go} openRecipe={openRecipe} />}
       {route === 'cycle'   && <window.CycleCalendar profile={profile} go={go} setProfile={setProfile} />}
-      {route === 'shop'    && <window.ShoppingList  profile={profile} go={go} />}
-      {route === 'profile' && <window.Profile       profile={profile} setProfile={setProfile} go={go} />}
+{route === 'profile' && <window.Profile       profile={profile} setProfile={setProfile} go={go} />}
 
       {/* Dev tweaks panel */}
       <window.TweaksPanel title="Tweaks">

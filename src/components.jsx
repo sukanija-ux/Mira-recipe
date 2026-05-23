@@ -193,7 +193,6 @@ function TopNav({ route, go, profile }) {
     { id: 'home',    label: 'Today' },
     { id: 'browse',  label: 'Recipes' },
     { id: 'cycle',   label: 'Cycle' },
-    { id: 'shop',    label: 'Shopping list' },
     { id: 'profile', label: 'Profile' },
   ];
   return (

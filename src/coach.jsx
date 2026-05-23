@@ -1,4 +1,4 @@
-// Health Snapshot + Claude-powered Health Coach
+// Health Snapshot + Gemini-powered Health Coach
 
 const { useState: useState_C, useEffect: useEffect_C, useRef: useRef_C } = React;
 
@@ -85,14 +85,15 @@ function HealthSnapshot({ profile }) {
 
 // ─── Health Coach ─────────────────────────────────────────────────────────────
 
+// OpenAI API key — replace with your key from platform.openai.com
+const OPENAI_KEY = 'sk-proj-REPLACE_WITH_YOUR_OPENAI_KEY';
+const OPENAI_URL = 'https://api.openai.com/v1/chat/completions';
+
 function HealthCoach({ profile }) {
   const phase         = window.phaseForDay(profile.day, profile.length);
   const proteinTarget = Math.round((profile.height - 100) * 1.5);
   const perMeal       = Math.round(proteinTarget / profile.meals);
 
-  const [apiKey,   setApiKey]   = useState_C(() => localStorage.getItem('mira_api_key') || '');
-  const [keyDraft, setKeyDraft] = useState_C('');
-  const [showKey,  setShowKey]  = useState_C(false);
   const [messages, setMessages] = useState_C([]);
   const [input,    setInput]    = useState_C('');
   const [loading,  setLoading]  = useState_C(false);
@@ -129,19 +130,8 @@ Coaching principles:
 - Never diagnose or prescribe. For medical concerns, recommend their GP or a hormone specialist.
 - If the user writes in a language other than English, respond in that language.`;
 
-  const saveKey = () => {
-    const k = keyDraft.trim();
-    if (!k.startsWith('sk-ant-')) { setError('Key should start with sk-ant-'); return; }
-    localStorage.setItem('mira_api_key', k);
-    setApiKey(k);
-    setShowKey(false);
-    setError('');
-    setKeyDraft('');
-  };
-
   const send = async () => {
     if (!input.trim() || loading) return;
-    if (!apiKey) { setShowKey(true); setError('Enter your Anthropic API key first.'); return; }
 
     const userMsg = { role: 'user', content: input.trim() };
     const history = [...messages, userMsg];
@@ -151,19 +141,20 @@ Coaching principles:
     setError('');
 
     try {
-      const res = await fetch('https://api.anthropic.com/v1/messages', {
+      const res = await fetch(OPENAI_URL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-api-key': apiKey,
-          'anthropic-version': '2023-06-01',
-          'anthropic-dangerous-direct-browser-access': 'true',
+          'Authorization': `Bearer ${OPENAI_KEY}`,
         },
         body: JSON.stringify({
-          model: 'claude-haiku-4-5',
+          model: 'gpt-4o-mini',
           max_tokens: 1024,
-          system: systemPrompt,
-          messages: history,
+          temperature: 0.7,
+          messages: [
+            { role: 'system', content: systemPrompt },
+            ...history.map(m => ({ role: m.role, content: m.content })),
+          ],
         }),
       });
 
@@ -172,7 +163,7 @@ Coaching principles:
         throw new Error(err?.error?.message || `API error ${res.status}`);
       }
       const data  = await res.json();
-      const reply = data.content?.[0]?.text || '';
+      const reply = data.choices?.[0]?.message?.content || '';
       setMessages([...history, { role: 'assistant', content: reply }]);
     } catch (e) {
       setError(e.message);
@@ -192,7 +183,7 @@ Coaching principles:
     <section style={{ marginBottom: 56, padding: '32px 36px', borderRadius: 24, background: 'oklch(0.97 0.018 90)', border: '1px solid oklch(0.86 0.025 95)' }}>
       {/* Header */}
       <div style={{ marginBottom: 22 }}>
-        <window.Eyebrow color={phase.color}>Health Coach · Powered by Claude</window.Eyebrow>
+        <window.Eyebrow color={phase.color}>Health Coach · Powered by GPT-4o</window.Eyebrow>
         <h2 style={{ fontFamily: 'Instrument Serif, serif', fontSize: 36, fontWeight: 400, color: 'oklch(0.28 0.040 145)', margin: '10px 0 5px' }}>
           Ask <em style={{ color: phase.color }}>anything</em> about your cycle & nutrition.
         </h2>
@@ -200,43 +191,6 @@ Coaching principles:
           Knows your {phase.name} phase, IR targets, gut focus, and today's seed cycling. Conversations stay in your browser.
         </p>
       </div>
-
-      {/* API key panel — hidden from users, toggle via Settings if needed */}
-      {showKey && (
-        <div style={{ padding: '20px 22px', borderRadius: 14, background: 'oklch(0.28 0.040 145)', marginBottom: 22 }}>
-          <window.Eyebrow color="oklch(0.76 0.08 88)">Anthropic API key</window.Eyebrow>
-          <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 12.5, color: 'oklch(0.74 0.020 90)', marginTop: 8, lineHeight: 1.55 }}>
-            Get a free key at{' '}
-            <a href="https://console.anthropic.com" target="_blank" style={{ color: 'oklch(0.76 0.08 88)' }}>console.anthropic.com</a>.
-            Stored only in your browser's localStorage — sent only to the Anthropic API.
-          </p>
-          <div style={{ display: 'flex', gap: 10, marginTop: 14 }}>
-            <input
-              type="password"
-              value={keyDraft}
-              onChange={e => setKeyDraft(e.target.value)}
-              onKeyDown={e => e.key === 'Enter' && saveKey()}
-              placeholder="sk-ant-api03-…"
-              style={{
-                flex: 1, padding: '10px 14px', borderRadius: 8,
-                border: '1px solid oklch(0.42 0.030 145)',
-                background: 'oklch(0.22 0.030 145)', color: 'oklch(0.90 0.022 90)',
-                fontFamily: 'JetBrains Mono, monospace', fontSize: 13,
-              }}
-            />
-            <window.Button onClick={saveKey} size="sm">Save key</window.Button>
-          </div>
-          {apiKey && (
-            <button
-              onClick={() => { localStorage.removeItem('mira_api_key'); setApiKey(''); setKeyDraft(''); setShowKey(false); }}
-              style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'DM Sans, sans-serif', fontSize: 12, color: 'oklch(0.62 0.12 35)', marginTop: 10, padding: 0 }}
-            >
-              Remove saved key
-            </button>
-          )}
-          {error && <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 12, color: 'oklch(0.65 0.15 35)', marginTop: 8 }}>{error}</p>}
-        </div>
-      )}
 
       {/* Message thread */}
       {messages.length > 0 && (
@@ -279,7 +233,7 @@ Coaching principles:
           )}
 
           {/* Inline error */}
-          {error && !showKey && (
+          {error && (
             <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 12.5, color: 'oklch(0.58 0.14 35)', paddingLeft: 40 }}>
               ⚠ {error}
             </p>
@@ -314,11 +268,7 @@ Coaching principles:
           value={input}
           onChange={e => setInput(e.target.value)}
           onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } }}
-          placeholder={
-            apiKey
-              ? `Ask about your ${phase.name.toLowerCase()} phase, IR meals, or gut health…`
-              : 'Add your Anthropic API key above to start chatting →'
-          }
+          placeholder={`Ask about your ${phase.name.toLowerCase()} phase, IR meals, or gut health…`}
           rows={2}
           style={{
             flex: 1, padding: '12px 15px', borderRadius: 12,
