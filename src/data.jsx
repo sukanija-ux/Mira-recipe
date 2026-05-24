@@ -2766,6 +2766,242 @@ function seasonalVegFor(country) {
   return SEASONAL_VEG[region]?.[month] || { season: 'Year-round', veg: [] };
 }
 
+// ─── Extended veg benefits lookup ────────────────────────────────────────────
+// Keyed by veg name (case-sensitive, matches SEASONAL_VEG entries).
+// Each entry: tagline (one line), benefits (2–4 bullet strings), phases (which cycle phases it supports).
+const VEG_INFO = {
+  'Kale': {
+    tagline: 'The estrobolome powerhouse',
+    benefits: [
+      'DIM (diindolylmethane) directly supports liver clearance of excess estrogen — crucial in the luteal phase',
+      'Highest magnesium content of any winter green; magnesium regulates 300+ enzymes including those controlling cortisol',
+      'Sulforaphane activates NRF2, the body\'s master antioxidant switch, reducing systemic inflammation',
+      'Glucosinolates peak after frost — seek frost-touched kale for maximum potency',
+    ],
+    phases: ['follicular', 'luteal'],
+  },
+  'Beetroot': {
+    tagline: 'Liver + circulation support',
+    benefits: [
+      'Betaine is a methyl donor — directly fuels the liver\'s methylation of estrogen before excretion',
+      'Nitrates convert to nitric oxide in the body, improving blood flow to ovaries and uterus',
+      'Betalains (the red pigment) are powerful anti-inflammatories and antioxidants',
+      'Supports phase II liver detox — the step where estrogen metabolites are made water-soluble for elimination',
+    ],
+    phases: ['menstrual', 'follicular'],
+  },
+  'Leeks': {
+    tagline: 'Estrobolome feeder',
+    benefits: [
+      'FOS (fructooligosaccharides) selectively feed Lactobacillus species in the gut — key for the estrobolome',
+      'The estrobolome is the collection of gut bacteria that regulate estrogen reabsorption; leeks directly nourish it',
+      'Gentle enough for a sensitive luteal-phase gut, unlike garlic or onion which can cause bloating',
+      'Kaempferol content has direct anti-inflammatory effects on ovarian tissue',
+    ],
+    phases: ['luteal', 'menstrual'],
+  },
+  'Asparagus': {
+    tagline: 'Folate + prebiotic spring food',
+    benefits: [
+      'One of the richest plant sources of folate — essential for DNA repair during the follicular phase when cells are multiplying',
+      'Inulin content is one of the highest of any vegetable; feeds Bifidobacterium specifically',
+      'Saponins in asparagus have anti-inflammatory and immune-modulating effects',
+      'Glutathione precursors support liver detox — eat within 2 days of purchase for full potency',
+    ],
+    phases: ['follicular', 'ovulatory'],
+  },
+  'Spinach': {
+    tagline: 'Iron + magnesium workhorse',
+    benefits: [
+      'Non-haem iron is most bioavailable when paired with vitamin C — squeeze lemon over cooked spinach',
+      'Magnesium content supports progesterone sensitivity in the luteal phase and reduces PMS cramping',
+      'Folate peaks in young leaves — choose baby spinach for maximum B9',
+      'Thylakoids from spinach significantly reduce hunger hormone ghrelin — useful for IR management',
+    ],
+    phases: ['menstrual', 'follicular'],
+  },
+  'Broccoli': {
+    tagline: 'DIM source for estrogen balance',
+    benefits: [
+      'Indole-3-carbinol (I3C) converts to DIM in the stomach — both directly shift estrogen toward protective metabolites',
+      'Sulforaphane is highest in slightly undercooked broccoli; overcooking destroys the myrosinase enzyme needed to activate it',
+      'Chromium content supports insulin sensitivity — relevant for PCOS and IR protocols',
+      'Cool-grown, winter broccoli has 2–3× higher glucosinolate content than summer varieties',
+    ],
+    phases: ['follicular', 'luteal'],
+  },
+  'Artichokes': {
+    tagline: 'Liver and bile tonic',
+    benefits: [
+      'Cynarin stimulates bile production — bile is how the liver excretes estrogen metabolites into the gut',
+      'If bile flow is sluggish, estrogen gets reabsorbed (estrogen dominance); artichokes directly interrupt this cycle',
+      'Silymarin-related compounds protect liver cells from oxidative damage',
+      'Inulin in the heart feeds gut bacteria and supports regular bowel transit — crucial for estrogen elimination',
+    ],
+    phases: ['luteal', 'menstrual'],
+  },
+  'Squash': {
+    tagline: 'Beta-carotene → progesterone pathway',
+    benefits: [
+      'Beta-carotene is a precursor to vitamin A, which is essential for progesterone receptor function',
+      'Studies link vitamin A deficiency to luteal phase defects and low progesterone',
+      'Pumpkin seeds (eat them too) contain the highest plant-based zinc — zinc is required for LH surge and ovulation',
+      'Carotenoids continue to concentrate during storage — a stored squash can be more nutritious than a fresh one',
+    ],
+    phases: ['luteal', 'ovulatory'],
+  },
+  'Fennel': {
+    tagline: 'Phytoestrogen + digestive soother',
+    benefits: [
+      'Anethole (fennel\'s primary phytoestrogen) has been shown to support estrogen activity in low-estrogen phases',
+      'Carminative compounds directly reduce bloating and gas — most relevant in the luteal phase when gut motility slows',
+      'Trans-anethole may support LH secretion in the follicular phase',
+      'High potassium content offsets luteal-phase water retention caused by progesterone',
+    ],
+    phases: ['follicular', 'luteal'],
+  },
+  'Bitter gourd': {
+    tagline: 'IR superfood — blood sugar first',
+    benefits: [
+      'Charantin activates PPAR-gamma receptors — the same pathway targeted by insulin-sensitising drugs, but naturally',
+      'Polypeptide-P (plant insulin) can directly lower blood glucose by mimicking insulin signalling',
+      'Best eaten at breakfast to blunt the morning cortisol spike that drives blood sugar up in IR',
+      'Most studied plant for PCOS blood sugar management; combine with protein for maximum effect',
+    ],
+    phases: ['follicular', 'ovulatory'],
+  },
+  'Moringa': {
+    tagline: 'The complete micronutrient leaf',
+    benefits: [
+      'Gram for gram: 4× the calcium of milk, 3× the iron of spinach, 7× the vitamin C of oranges',
+      'Isothiocyanates in the leaves support thyroid function — hypothyroid women often benefit significantly',
+      'Mahanimbine and other alkaloids support insulin receptor sensitivity — relevant for PCOS and IR',
+      'One of the few plants with all 9 essential amino acids — a complete protein source',
+    ],
+    phases: ['follicular', 'ovulatory', 'luteal'],
+  },
+  'Turmeric root': {
+    tagline: 'Anti-inflammatory at source',
+    benefits: [
+      'Fresh turmeric rhizome contains 5× more curcumin and essential oils than dried powder',
+      'Curcumin inhibits NF-κB — the master inflammatory switch upregulated in PCOS, endometriosis, and luteal inflammation',
+      'Turmerones (volatile oils) in fresh root enhance curcumin absorption by 4× compared to isolated curcumin supplements',
+      'Combine with black pepper (piperine) and fat — both are required for meaningful absorption',
+    ],
+    phases: ['menstrual', 'luteal'],
+  },
+  'Tomatoes': {
+    tagline: 'Lycopene — estrogen-protective',
+    benefits: [
+      'Lycopene is most bioavailable in cooked tomatoes with olive oil — raw tomatoes release much less',
+      'Lycopene has been shown to modulate estrogen receptor activity, reducing estrogen-driven cell proliferation',
+      'Lutein and beta-carotene in tomatoes support corpus luteum health — the temporary gland that makes progesterone',
+      'Chopped and heated tomatoes release 5× more lycopene than whole raw — make sauce, not salad',
+    ],
+    phases: ['ovulatory', 'luteal'],
+  },
+  'Peppers': {
+    tagline: 'Vitamin C × 2 of an orange',
+    benefits: [
+      'Capsicum has 2× the vitamin C of an orange by weight — vitamin C is required for collagen in follicle walls',
+      'Capsaicin (in hot peppers) activates TRPV1 receptors linked to improved insulin sensitivity and reduced visceral fat',
+      'Red peppers have 4× more vitamin C than green — colour = ripeness = nutrient density',
+      'Vitamin C in the follicular phase supports iron absorption from plant foods; eat peppers with iron-rich meals',
+    ],
+    phases: ['follicular', 'ovulatory'],
+  },
+  'Brussels sprouts': {
+    tagline: 'I3C — direct estrogen metabolism',
+    benefits: [
+      'Indole-3-carbinol (I3C) directly shifts estrogen metabolism toward the protective 2-OHE1 pathway and away from the proliferative 16α-OHE1',
+      'DIM (the stomach metabolite of I3C) is sold as a supplement — eating 4–5 Brussels sprouts achieves therapeutic doses',
+      'Freshly harvested sprouts have the highest glucosinolate content; frozen sprouts lose about 30%',
+      'The fibrous cell walls require chewing or chopping to release myrosinase — the enzyme that activates glucosinolates',
+    ],
+    phases: ['luteal', 'menstrual'],
+  },
+  'Pomegranate': {
+    tagline: 'Urolithins — mitochondrial renewal',
+    benefits: [
+      'Punicalagins in pomegranate are converted by gut bacteria to urolithins, which trigger mitophagy (cellular energy renewal)',
+      'Ellagic acid directly inhibits aromatase — the enzyme that converts androgens to estrogen (relevant for estrogen dominance and PCOS)',
+      'Urolithin A has been shown to improve muscle mitochondrial function — relevant for fatigue in PCOS and perimenopause',
+      'Only ~40% of people have the gut bacteria to convert punicalagins; a diverse microbiome is needed — pair with prebiotic foods',
+    ],
+    phases: ['follicular', 'ovulatory'],
+  },
+  'Cucumber': {
+    tagline: 'Silica + gut lining support',
+    benefits: [
+      'Silica (silicon dioxide) supports the gut mucosal lining — critical for leaky gut and estrobolome function',
+      'Cucurbitacins (bitter compounds in skin) have shown anti-androgenic properties — helpful for PCOS',
+      'Fisetin, a flavonoid in cucumber, has shown neuroprotective and anti-inflammatory effects in animal models',
+      'High water content (96%) supports kidney function and the elimination of estrogen metabolites via urine',
+    ],
+    phases: ['ovulatory', 'luteal'],
+  },
+  'Sweet potato': {
+    tagline: 'Progesterone-pathway carotenoids',
+    benefits: [
+      'Beta-carotene converts to vitamin A, which is required for progesterone receptor sensitivity in the luteal phase',
+      'Adiponectin-boosting carotenoids improve insulin sensitivity — particularly relevant for PCOS and IR',
+      'Resistant starch (especially when cooled after cooking) feeds Bifidobacterium, which supports estrogen metabolism',
+      'Lower GI than regular potato, especially when boiled or steamed rather than baked',
+    ],
+    phases: ['luteal'],
+  },
+  'Red cabbage': {
+    tagline: 'Anthocyanins for insulin sensitivity',
+    benefits: [
+      'Anthocyanins modulate insulin receptor sensitivity — regular consumption linked to improved fasting glucose',
+      'Fermented as sauerkraut: produces lactobacillus strains that actively metabolise estrogen in the gut',
+      'DIM content (though lower than broccoli) adds to total cruciferous intake for the week',
+      'Highest anthocyanin content of any common vegetable — the darker the colour, the higher the dose',
+    ],
+    phases: ['luteal', 'menstrual'],
+  },
+  'Celeriac': {
+    tagline: 'Adrenal + cortisol balance',
+    benefits: [
+      'Phthalides are unique compounds found almost exclusively in celery family plants; they modulate the HPA axis and reduce cortisol output',
+      'Vitamin K2 content supports bone density — particularly important in perimenopause and luteal phase',
+      'Low GI complex carbohydrate — provides sustained energy without spiking insulin',
+      'Phosphorus and magnesium together support progesterone synthesis in the corpus luteum',
+    ],
+    phases: ['luteal', 'menstrual'],
+  },
+  'Wild garlic': {
+    tagline: 'Allicin liver enzyme activator',
+    benefits: [
+      'Allicin (the active compound released when garlic is crushed) upregulates liver CYP enzymes involved in estrogen phase I metabolism',
+      'Wild garlic has a milder allicin profile than cultivated — better tolerated in SIBO and digestive sensitivity',
+      'Ajoene (from garlic) inhibits platelet aggregation — supports circulation during menstruation',
+      'Prebiotic FOS in the bulbs feeds Lactobacillus and Bifidobacterium without the FODMAP load of cultivated garlic',
+    ],
+    phases: ['follicular', 'menstrual'],
+  },
+  'Yam': {
+    tagline: 'Diosgenin — progesterone precursor',
+    benefits: [
+      'Diosgenin is a phytosterol that is the biological precursor to progesterone in a laboratory — though direct conversion in the human body is not proven, it appears to modulate progesterone receptors',
+      'Used in Ayurvedic and traditional Chinese medicine for centuries to support the luteal phase and reduce PMS',
+      'Resistant starch content is among the highest of any root vegetable when eaten cooled',
+      'Potassium offsets the water-retaining effect of progesterone in the luteal phase',
+    ],
+    phases: ['luteal'],
+  },
+  'Fenugreek leaves': {
+    tagline: 'Blood sugar + phytoestrogen',
+    benefits: [
+      'Diosgenin in fenugreek modulates estrogen receptors — used clinically to support estrogenic activity in low-estrogen phases',
+      'Galactomannan fibre slows gastric emptying, blunting post-meal blood sugar spikes — relevant for IR and PCOS',
+      '4-hydroxyisoleucine (a unique amino acid in fenugreek) directly stimulates insulin secretion from pancreatic beta cells',
+      'Bitter taste signals bile flow — improving fat digestion and estrogen clearance via bile',
+    ],
+    phases: ['follicular', 'luteal'],
+  },
+};
+
 // Tag display config — color per tag family
 const TAG_STYLES = {
   'Gut-healing':       { bg: 'oklch(0.91 0.05 145)', fg: 'oklch(0.32 0.08 145)', bd: 'oklch(0.78 0.07 145)' },
@@ -2868,7 +3104,7 @@ Object.assign(window, {
   RECIPES, recipeById, PLAN_BY_PHASE, countPlantsToday,
   DIETS, ALLERGENS, ETHNICITIES, CUISINES, lifeStageFor,
   SUPERMARKETS, STORE_CATEGORIES, STORE_BRAND,
-  brandFor, bestStoreFor, storesForCountry, seasonalVegFor,
+  brandFor, bestStoreFor, storesForCountry, seasonalVegFor, VEG_INFO,
   TAG_STYLES, tagStyle, CARD_TAGS,
   RECIPE_CUISINE_FILTERS,
   HEALTH_CONDITIONS,

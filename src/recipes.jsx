@@ -125,6 +125,120 @@ function AddToPlanPicker({ recipe, profile, setProfile, onClose }) {
   );
 }
 
+// ── Week planner (slot picker uses existing RecipePicker-style inline search) ──
+
+function WeekSlotPicker({ slot, onSelect, onClose }) {
+  const [query, setQuery] = useState_R('');
+  const inputRef = useRef_R(null);
+  useEffect_R(() => { inputRef.current?.focus(); }, []);
+  const recipes = window.RECIPES.filter(r =>
+    !query || r.title.toLowerCase().includes(query.toLowerCase()) || (r.cuisine || '').toLowerCase().includes(query.toLowerCase())
+  );
+  return (
+    <div onClick={onClose} style={{ position: 'fixed', inset: 0, background: 'oklch(0.15 0.02 145 / 0.45)', zIndex: 300, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
+      <div onClick={e => e.stopPropagation()} style={{ background: 'oklch(0.97 0.018 90)', borderRadius: 20, width: '100%', maxWidth: 460, maxHeight: '68vh', display: 'flex', flexDirection: 'column', overflow: 'hidden', boxShadow: '0 24px 64px oklch(0.15 0.04 145 / 0.25)' }}>
+        <div style={{ padding: '16px 20px 12px', borderBottom: '1px solid oklch(0.88 0.022 95)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+            <window.Eyebrow>{slot.meal.charAt(0).toUpperCase() + slot.meal.slice(1)} · {slot.label}</window.Eyebrow>
+            <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 18, color: 'oklch(0.54 0.030 135)', lineHeight: 1 }}>×</button>
+          </div>
+          <input ref={inputRef} value={query} onChange={e => setQuery(e.target.value)} placeholder="Search recipes…"
+            style={{ width: '100%', padding: '8px 12px', borderRadius: 9, border: '1px solid oklch(0.84 0.025 95)', background: 'white', fontFamily: 'DM Sans, sans-serif', fontSize: 13.5, color: 'oklch(0.28 0.040 145)', outline: 'none' }} />
+        </div>
+        <div style={{ overflowY: 'auto', padding: '6px 10px 10px' }}>
+          {slot.current && (
+            <button onClick={() => onSelect(null)} style={{ width: '100%', textAlign: 'left', padding: '8px 10px', borderRadius: 7, background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'DM Sans, sans-serif', fontSize: 12, color: 'oklch(0.58 0.030 135)', marginBottom: 2 }}>
+              ✕ Remove meal
+            </button>
+          )}
+          {recipes.map(r => (
+            <button key={r.id} onClick={() => onSelect(r.id)}
+              style={{ width: '100%', textAlign: 'left', padding: '9px 10px', borderRadius: 9, background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'baseline', gap: 10 }}
+              onMouseEnter={e => e.currentTarget.style.background = 'white'}
+              onMouseLeave={e => e.currentTarget.style.background = 'none'}
+            >
+              <span style={{ fontFamily: 'Instrument Serif, serif', fontSize: 17, color: 'oklch(0.28 0.040 145)', flex: 1 }}>{r.title}</span>
+              <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 9.5, color: 'oklch(0.56 0.028 135)', flexShrink: 0, letterSpacing: '0.05em' }}>{r.minutes}m · {r.protein}g P</span>
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function WeekPlanner({ profile, setProfile, phase }) {
+  const today     = new Date(); today.setHours(0,0,0,0);
+  const todayKey  = dateKeyR(today);
+  const days      = Array.from({ length: 7 }, (_, i) => addDaysR(today, i));
+  const mealSlots = profile.meals === 2 ? ['lunch', 'dinner'] : ['breakfast', 'lunch', 'dinner'];
+  const [picker, setPicker] = useState_R(null);
+
+  function setMeal(dk, meal, recipeId) {
+    const plan = { ...profile.mealPlan };
+    plan[dk]   = { ...(plan[dk] || {}), [meal]: recipeId };
+    if (!recipeId) delete plan[dk][meal];
+    if (Object.keys(plan[dk] || {}).length === 0) delete plan[dk];
+    setProfile({ ...profile, mealPlan: plan });
+  }
+
+  return (
+    <>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 8, marginBottom: 48 }}>
+        {days.map(d => {
+          const dk      = dateKeyR(d);
+          const isToday = dk === todayKey;
+          const saved   = profile.mealPlan?.[dk] || {};
+          return (
+            <div key={dk} style={{ borderRadius: 14, border: isToday ? `1.5px solid ${phase.color}` : '1px solid oklch(0.88 0.022 95)', background: isToday ? phase.soft : 'oklch(0.97 0.015 90)', padding: '12px 10px', minHeight: 120 }}>
+              <div style={{ marginBottom: 10 }}>
+                <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 9.5, letterSpacing: '0.08em', color: isToday ? phase.color : 'oklch(0.56 0.028 135)', textTransform: 'uppercase' }}>
+                  {isToday ? 'Today' : DAY_LABELS_R[d.getDay()]}
+                </div>
+                <div style={{ fontFamily: 'Instrument Serif, serif', fontSize: 20, color: 'oklch(0.28 0.040 145)', lineHeight: 1.1, fontWeight: 400 }}>
+                  {d.getDate()}
+                </div>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+                {mealSlots.map(meal => {
+                  const rid    = saved[meal];
+                  const recipe = rid ? window.recipeById(rid) : null;
+                  return (
+                    <button key={meal}
+                      onClick={() => setPicker({ date: d, dateKey: dk, meal, label: `${DAY_LABELS_R[d.getDay()]} ${d.getDate()}`, current: rid })}
+                      title={meal}
+                      style={{ textAlign: 'left', padding: '5px 7px', borderRadius: 7, background: recipe ? 'white' : 'transparent', border: recipe ? '1px solid oklch(0.88 0.022 95)' : '1px dashed oklch(0.82 0.022 95)', cursor: 'pointer', width: '100%' }}
+                      onMouseEnter={e => e.currentTarget.style.background = 'white'}
+                      onMouseLeave={e => e.currentTarget.style.background = recipe ? 'white' : 'transparent'}
+                    >
+                      {recipe ? (
+                        <span style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 11, color: 'oklch(0.30 0.038 145)', lineHeight: 1.3, display: 'block' }}>
+                          {recipe.title.length > 18 ? recipe.title.slice(0, 17) + '…' : recipe.title}
+                        </span>
+                      ) : (
+                        <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 9, color: 'oklch(0.66 0.020 135)', letterSpacing: '0.05em' }}>
+                          {meal[0].toUpperCase()} +
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+      {picker && (
+        <WeekSlotPicker
+          slot={picker}
+          onSelect={id => { setMeal(picker.dateKey, picker.meal, id); setPicker(null); }}
+          onClose={() => setPicker(null)}
+        />
+      )}
+    </>
+  );
+}
+
 // ── Recipe browse ─────────────────────────────────────────────────────────────
 
 function RecipeBrowse({ profile, setProfile, openRecipe }) {
@@ -159,7 +273,16 @@ function RecipeBrowse({ profile, setProfile, openRecipe }) {
 
   return (
     <div style={{ maxWidth: 1180, margin: '0 auto', padding: '64px 32px 120px' }}>
-      <header style={{ marginBottom: 56 }}>
+
+      {/* ── Meal prep calendar ── */}
+      <div style={{ marginBottom: 16 }}>
+        <window.Eyebrow>Meal prep · next 7 days</window.Eyebrow>
+        <div style={{ marginTop: 14 }}>
+          <WeekPlanner profile={profile} setProfile={setProfile} phase={phase} />
+        </div>
+      </div>
+
+      <header style={{ marginBottom: 56, paddingTop: 16, borderTop: '1px solid oklch(0.87 0.022 95)' }}>
         <window.Eyebrow>Recipe library · {list.length} of {window.RECIPES.length}</window.Eyebrow>
         <h1 style={{ fontFamily: 'Instrument Serif, serif', fontSize: 72, lineHeight: 0.98, color: 'oklch(0.28 0.040 145)', margin: '18px 0 0', fontWeight: 400 }}>
           <em>Real</em> recipes, from real kitchens.
