@@ -85,38 +85,7 @@ function App() {
       {route === 'browse'  && <window.RecipeBrowse  profile={profile} setProfile={setProfile} openRecipe={openRecipe} />}
       {route === 'recipe'  && recipeId && <window.RecipeDetail id={recipeId} profile={profile} setProfile={setProfile} go={go} openRecipe={openRecipe} />}
       {route === 'cycle'   && <window.CycleCalendar profile={profile} go={go} setProfile={setProfile} />}
-{route === 'profile' && <window.Profile       profile={profile} setProfile={setProfile} go={go} />}
-
-      {/* Dev tweaks panel */}
-      <window.TweaksPanel title="Tweaks">
-        <window.TweakSection label="Cycle">
-          <window.TweakSlider
-            label="Cycle day" value={tweaks.phaseDay} min={1} max={28}
-            onChange={v => setTweak('phaseDay', v)}
-            unit={` · ${window.phaseForDay(tweaks.phaseDay).name}`}
-          />
-        </window.TweakSection>
-        <window.TweakSection label="Region">
-          <window.TweakSelect
-            label="Default store" value={tweaks.region}
-            options={window.SUPERMARKETS.map(s => ({
-              value: s.id,
-              label: `${s.name} · ${window.STORE_CATEGORIES.find(c => c.id === s.category)?.label}`,
-            }))}
-            onChange={v => setTweak('region', v)}
-          />
-        </window.TweakSection>
-        <window.TweakSection label="Diet">
-          <window.TweakSelect
-            label="Framework" value={tweaks.diet}
-            options={window.DIETS.map(d => ({ value: d.id, label: d.name }))}
-            onChange={v => setTweak('diet', v)}
-          />
-        </window.TweakSection>
-        <window.TweakSection label="Flow">
-          <window.TweakButton label="Replay onboarding →" onClick={() => setTweak('showOnboarding', true)} />
-        </window.TweakSection>
-      </window.TweaksPanel>
+{route === 'profile' && <window.Profile profile={profile} setProfile={setProfile} go={go} tweaks={tweaks} setTweak={setTweak} />}
     </div>
   );
 }

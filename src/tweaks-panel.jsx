@@ -24,43 +24,35 @@ function useTweaks(defaults) {
   return [tweaks, setTweak];
 }
 
-// Container for the floating panel
+// Inline panel — rendered wherever it's placed (bottom of Profile)
 function TweaksPanel({ title = 'Tweaks', children }) {
   const [open, setOpen] = useState_T(false);
   return (
-    <div style={{ position: 'fixed', bottom: 24, right: 24, zIndex: 200 }}>
+    <div style={{ marginTop: 8 }}>
+      <button
+        onClick={() => setOpen(o => !o)}
+        style={{
+          display: 'flex', alignItems: 'center', gap: 8,
+          background: 'none', border: 'none', cursor: 'pointer',
+          fontFamily: 'JetBrains Mono, monospace', fontSize: 10.5,
+          letterSpacing: '0.08em', textTransform: 'uppercase',
+          color: 'oklch(0.60 0.028 135)', padding: '6px 0',
+        }}
+      >
+        <span style={{ fontSize: 14 }}>⚙</span> {open ? 'Hide dev tools' : 'Dev tools'}
+      </button>
       {open && (
         <div style={{
-          marginBottom: 12,
+          marginTop: 12,
           background: 'oklch(0.97 0.018 90)',
           border: '1px solid oklch(0.86 0.025 95)',
           borderRadius: 16,
           padding: 20,
-          width: 300,
-          boxShadow: '0 8px 32px oklch(0.28 0.04 145 / 0.10)',
+          display: 'flex', flexDirection: 'column', gap: 20,
         }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-            <window.Eyebrow>{title}</window.Eyebrow>
-            <button onClick={() => setOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'oklch(0.50 0.035 135)', fontSize: 18, lineHeight: 1 }}>×</button>
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>{children}</div>
+          {children}
         </div>
       )}
-      <button onClick={() => setOpen(o => !o)} style={{
-        width: 44, height: 44, borderRadius: 999,
-        background: 'oklch(0.28 0.040 145)',
-        color: 'oklch(0.93 0.022 90)',
-        border: 'none', cursor: 'pointer',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        fontSize: 18,
-        boxShadow: '0 4px 16px oklch(0.28 0.04 145 / 0.25)',
-        transition: 'transform 0.15s ease',
-        float: 'right',
-      }}
-        onMouseDown={e => e.currentTarget.style.transform = 'scale(0.95)'}
-        onMouseUp={e => e.currentTarget.style.transform = 'scale(1)'}
-        onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
-      >⚙</button>
     </div>
   );
 }

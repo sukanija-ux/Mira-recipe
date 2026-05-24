@@ -374,20 +374,16 @@ function Dashboard({ profile, setProfile, go, openRecipe }) {
         {seasonal && seasonal.veg && seasonal.veg.length > 0 ? (
           <div style={{ flex: 1 }}>
             <window.Eyebrow>In season · {seasonal.season} · {profile.country || 'your area'}</window.Eyebrow>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 10 }}>
+            <ul style={{ listStyle: 'none', padding: 0, margin: '10px 0 0', display: 'flex', flexDirection: 'column', gap: 6 }}>
               {seasonal.veg.map(v => (
-                <span key={v.name} title={v.note} style={{
-                  padding: '5px 12px', borderRadius: 999,
-                  background: phase.soft, border: `1px solid ${phase.color}28`,
-                  fontFamily: 'DM Sans, sans-serif', fontSize: 12.5, fontWeight: 500,
-                  color: 'oklch(0.34 0.038 140)', cursor: 'default',
-                }}>
-                  {v.name}
-                </span>
+                <li key={v.name} style={{ display: 'flex', gap: 10, alignItems: 'baseline' }}>
+                  <span style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 13, fontWeight: 500, color: 'oklch(0.30 0.040 145)', flexShrink: 0 }}>{v.name}</span>
+                  <span style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 12, color: 'oklch(0.52 0.030 135)', lineHeight: 1.45 }}>{v.note}</span>
+                </li>
               ))}
-            </div>
-            <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 11.5, color: 'oklch(0.54 0.028 135)', marginTop: 8, lineHeight: 1.5 }}>
-              Hover any veg for its hormonal benefit. · Today's meals include {plantsToday} plants — aim for 30 a week.
+            </ul>
+            <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 11.5, color: 'oklch(0.58 0.025 135)', marginTop: 10 }}>
+              Today's meals include {plantsToday} plants — aim for 30 a week.
             </p>
           </div>
         ) : <div />}

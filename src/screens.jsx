@@ -444,7 +444,7 @@ function CycleCalendar({ profile, go, setProfile }) {
 }
 
 
-function Profile({ profile, setProfile, go }) {
+function Profile({ profile, setProfile, go, tweaks, setTweak }) {
   const proteinTarget = Math.round((profile.height - 100) * 1.5);
 
   const Block = ({ title, children }) => (
@@ -651,6 +651,41 @@ function Profile({ profile, setProfile, go }) {
         <span style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 13, color: 'oklch(0.54 0.035 135)' }}>Changes save automatically.</span>
         <window.Button variant="ghost" onClick={() => go('home')}>Back to today →</window.Button>
       </div>
+
+      {/* Dev tools — tucked at the very bottom */}
+      {tweaks && setTweak && (
+        <div style={{ marginTop: 24, paddingTop: 24, borderTop: '1px solid oklch(0.90 0.018 95)' }}>
+          <window.TweaksPanel>
+            <window.TweakSection label="Cycle">
+              <window.TweakSlider
+                label="Cycle day" value={tweaks.phaseDay} min={1} max={28}
+                onChange={v => setTweak('phaseDay', v)}
+                unit={` · ${window.phaseForDay(tweaks.phaseDay).name}`}
+              />
+            </window.TweakSection>
+            <window.TweakSection label="Region">
+              <window.TweakSelect
+                label="Default store" value={tweaks.region}
+                options={window.SUPERMARKETS.map(s => ({
+                  value: s.id,
+                  label: `${s.name} · ${window.STORE_CATEGORIES.find(c => c.id === s.category)?.label}`,
+                }))}
+                onChange={v => setTweak('region', v)}
+              />
+            </window.TweakSection>
+            <window.TweakSection label="Diet">
+              <window.TweakSelect
+                label="Framework" value={tweaks.diet}
+                options={window.DIETS.map(d => ({ value: d.id, label: d.name }))}
+                onChange={v => setTweak('diet', v)}
+              />
+            </window.TweakSection>
+            <window.TweakSection label="Flow">
+              <window.TweakButton label="Replay onboarding →" onClick={() => setTweak('showOnboarding', true)} />
+            </window.TweakSection>
+          </window.TweaksPanel>
+        </div>
+      )}
     </div>
   );
 }
