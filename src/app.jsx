@@ -82,8 +82,8 @@ function App() {
       <window.TopNav route={route} go={go} profile={profile} />
 
       {route === 'home'    && <window.Dashboard     profile={profile} setProfile={setProfile} go={go} openRecipe={openRecipe} />}
-      {route === 'browse'  && <window.RecipeBrowse  profile={profile} openRecipe={openRecipe} />}
-      {route === 'recipe'  && recipeId && <window.RecipeDetail id={recipeId} profile={profile} go={go} openRecipe={openRecipe} />}
+      {route === 'browse'  && <window.RecipeBrowse  profile={profile} setProfile={setProfile} openRecipe={openRecipe} />}
+      {route === 'recipe'  && recipeId && <window.RecipeDetail id={recipeId} profile={profile} setProfile={setProfile} go={go} openRecipe={openRecipe} />}
       {route === 'cycle'   && <window.CycleCalendar profile={profile} go={go} setProfile={setProfile} />}
 {route === 'profile' && <window.Profile       profile={profile} setProfile={setProfile} go={go} />}
 
