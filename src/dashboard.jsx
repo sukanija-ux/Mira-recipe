@@ -75,6 +75,27 @@ function Dashboard({ profile, go, openRecipe }) {
         </div>
       </section>
 
+      {/* Seasonal veg hint */}
+      {(() => {
+        const seasonal = window.seasonalVegFor ? window.seasonalVegFor(profile.country || 'Germany') : null;
+        if (!seasonal || !seasonal.veg || !seasonal.veg.length) return null;
+        return (
+          <section style={{ marginBottom: 32 }}>
+            <div style={{ padding: '24px 28px', borderRadius: 18, background: 'oklch(0.97 0.018 90)', border: '1px solid oklch(0.86 0.025 95)' }}>
+              <window.Eyebrow>Seasonal produce · {seasonal.season} in {profile.country || 'your area'}</window.Eyebrow>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, marginTop: 14 }}>
+                {seasonal.veg.map(v => (
+                  <div key={v.name} style={{ padding: '10px 16px', borderRadius: 12, background: phase.soft, border: `1px solid ${phase.color}30` }}>
+                    <div style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 13.5, fontWeight: 500, color: 'oklch(0.28 0.040 145)' }}>{v.name}</div>
+                    <div style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 12, color: 'oklch(0.48 0.035 140)', marginTop: 3, lineHeight: 1.4 }}>{v.note}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+        );
+      })()}
+
       {/* Movement card */}
       {phase.movement && (
         <section style={{ marginBottom: 64 }}>

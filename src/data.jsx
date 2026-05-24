@@ -2564,28 +2564,77 @@ const ALLERGENS = [
   { id: 'nightshade', name: 'Nightshade',                   group: 'digestive' },
 ];
 
+// ─── Stores by country ────────────────────────────────────────────────────────
 const SUPERMARKETS = [
-  { id: 'REWE',     name: 'REWE',           tag: 'Full-range · Bio line',       category: 'supermarket', distance: '0.4 km · Torstraße',          color: 'oklch(0.55 0.13 25)' },
-  { id: 'Edeka',    name: 'Edeka',          tag: 'Full-range · regional',       category: 'supermarket', distance: '0.7 km · Linienstraße',        color: 'oklch(0.55 0.12 250)' },
-  { id: 'Kaufland', name: 'Kaufland',       tag: 'Hypermarket · K-Bio',         category: 'supermarket', distance: '1.2 km · Alexanderplatz',       color: 'oklch(0.55 0.13 22)' },
-  { id: 'AldiNord', name: 'ALDI Nord',      tag: 'Discount · ALDI Bio',         category: 'discount',    distance: '0.5 km · Brunnenstraße',        color: 'oklch(0.55 0.13 248)' },
-  { id: 'AldiSued', name: 'ALDI Süd',       tag: 'Discount · ALDI Bio',         category: 'discount',    distance: '0.9 km · Friedrichstraße',      color: 'oklch(0.55 0.13 248)' },
-  { id: 'Lidl',     name: 'Lidl',           tag: 'Discount · Bio Organic',      category: 'discount',    distance: '0.6 km · Rosenthaler Pl.',      color: 'oklch(0.58 0.13 50)' },
-  { id: 'Penny',    name: 'Penny',          tag: 'Discount · Naturgut Bio',     category: 'discount',    distance: '0.8 km · Auguststraße',         color: 'oklch(0.58 0.12 30)' },
-  { id: 'Netto',    name: 'Netto',          tag: 'Discount · BioBio',           category: 'discount',    distance: '1.4 km · Schönhauser',          color: 'oklch(0.55 0.13 35)' },
-  { id: 'Alnatura', name: 'Alnatura',       tag: 'Bio supermarket',             category: 'organic',     distance: '1.1 km · Rosa-Luxemburg',       color: 'oklch(0.55 0.10 145)' },
-  { id: 'Denns',    name: "Denn's BioMarkt", tag: 'Bio supermarket',            category: 'organic',     distance: '1.6 km · Kastanienallee',       color: 'oklch(0.50 0.10 145)' },
-  { id: 'Bioco',    name: 'BIO COMPANY',    tag: 'Berlin bio chain',            category: 'organic',     distance: '0.5 km · Brunnenstraße',        color: 'oklch(0.52 0.11 140)' },
-  { id: 'dm',       name: 'dm-drogerie',    tag: 'Drogerie · dmBio',            category: 'drugstore',   distance: '0.3 km · Torstraße',            color: 'oklch(0.55 0.13 75)' },
-  { id: 'Rossmann', name: 'Rossmann',       tag: 'Drogerie · enerBiO',          category: 'drugstore',   distance: '0.6 km · Friedrichstraße',      color: 'oklch(0.50 0.14 22)' },
-  { id: 'Mueller',  name: 'Müller',         tag: 'Drogerie · health & beauty',  category: 'drugstore',   distance: '1.5 km · Hackescher Markt',     color: 'oklch(0.55 0.13 18)' },
+  // Germany
+  { id: 'REWE',       name: 'REWE',            tag: 'Full-range · Bio line',        category: 'supermarket', country: 'Germany',        color: 'oklch(0.55 0.13 25)' },
+  { id: 'Edeka',      name: 'Edeka',           tag: 'Full-range · regional',        category: 'supermarket', country: 'Germany',        color: 'oklch(0.55 0.12 250)' },
+  { id: 'Kaufland',   name: 'Kaufland',        tag: 'Hypermarket · K-Bio',          category: 'supermarket', country: 'Germany',        color: 'oklch(0.55 0.13 22)' },
+  { id: 'AldiNord',   name: 'ALDI Nord',       tag: 'Discount · ALDI Bio',          category: 'discount',    country: 'Germany',        color: 'oklch(0.55 0.13 248)' },
+  { id: 'Lidl-DE',    name: 'Lidl',            tag: 'Discount · Bio Organic',       category: 'discount',    country: 'Germany',        color: 'oklch(0.58 0.13 50)' },
+  { id: 'Penny',      name: 'Penny',           tag: 'Discount · Naturgut Bio',      category: 'discount',    country: 'Germany',        color: 'oklch(0.58 0.12 30)' },
+  { id: 'Alnatura',   name: 'Alnatura',        tag: 'Organic supermarket',          category: 'organic',     country: 'Germany',        color: 'oklch(0.55 0.10 145)' },
+  { id: 'Denns',      name: "Denn's BioMarkt", tag: 'Organic supermarket',          category: 'organic',     country: 'Germany',        color: 'oklch(0.50 0.10 145)' },
+  { id: 'dm',         name: 'dm-drogerie',     tag: 'Drogerie · dmBio',             category: 'pharmacy',    country: 'Germany',        color: 'oklch(0.55 0.13 75)' },
+  { id: 'Rossmann',   name: 'Rossmann',        tag: 'Drogerie · enerBiO',           category: 'pharmacy',    country: 'Germany',        color: 'oklch(0.50 0.14 22)' },
+  // United Kingdom
+  { id: 'Tesco',      name: 'Tesco',           tag: 'Full-range · Tesco Finest',    category: 'supermarket', country: 'United Kingdom', color: 'oklch(0.50 0.13 22)' },
+  { id: 'Sainsburys', name: "Sainsbury's",     tag: 'Full-range · Taste the Diff.', category: 'supermarket', country: 'United Kingdom', color: 'oklch(0.55 0.12 250)' },
+  { id: 'Waitrose',   name: 'Waitrose',        tag: 'Premium · own-brand organic',  category: 'supermarket', country: 'United Kingdom', color: 'oklch(0.45 0.08 145)' },
+  { id: 'Aldi-UK',    name: 'Aldi',            tag: 'Discount · Specially Selected',category: 'discount',    country: 'United Kingdom', color: 'oklch(0.55 0.13 248)' },
+  { id: 'Lidl-UK',    name: 'Lidl',            tag: 'Discount · Organic range',     category: 'discount',    country: 'United Kingdom', color: 'oklch(0.58 0.13 50)' },
+  { id: 'HollandB',   name: 'Holland & Barrett',tag: 'Health & supplements',        category: 'pharmacy',    country: 'United Kingdom', color: 'oklch(0.50 0.10 145)' },
+  { id: 'PlanetOrg',  name: 'Planet Organic',  tag: 'Organic specialist',           category: 'organic',     country: 'United Kingdom', color: 'oklch(0.52 0.10 140)' },
+  // France
+  { id: 'Carrefour',  name: 'Carrefour',       tag: 'Hypermarché · Bio line',       category: 'supermarket', country: 'France',         color: 'oklch(0.50 0.13 248)' },
+  { id: 'Monoprix',   name: 'Monoprix',        tag: 'City supermarket · bio range', category: 'supermarket', country: 'France',         color: 'oklch(0.55 0.10 145)' },
+  { id: 'BioCBon',    name: "Bio c' Bon",      tag: 'Organic specialist',           category: 'organic',     country: 'France',         color: 'oklch(0.52 0.10 140)' },
+  { id: 'Naturalia',  name: 'Naturalia',       tag: 'Organic specialist · Parisian',category: 'organic',     country: 'France',         color: 'oklch(0.50 0.10 145)' },
+  { id: 'Lidl-FR',    name: 'Lidl',            tag: 'Discount · organic range',     category: 'discount',    country: 'France',         color: 'oklch(0.58 0.13 50)' },
+  // Netherlands
+  { id: 'AlbertH',    name: 'Albert Heijn',    tag: 'Full-range · AH Organic',      category: 'supermarket', country: 'Netherlands',    color: 'oklch(0.50 0.13 248)' },
+  { id: 'Jumbo',      name: 'Jumbo',           tag: 'Full-range · wide range',      category: 'supermarket', country: 'Netherlands',    color: 'oklch(0.60 0.13 88)' },
+  { id: 'Ekoplaza',   name: 'Ekoplaza',        tag: 'Organic specialist',           category: 'organic',     country: 'Netherlands',    color: 'oklch(0.52 0.10 140)' },
+  { id: 'Lidl-NL',    name: 'Lidl',            tag: 'Discount · bio range',         category: 'discount',    country: 'Netherlands',    color: 'oklch(0.58 0.13 50)' },
+  // Sweden / Nordic
+  { id: 'ICA',        name: 'ICA',             tag: 'Full-range · I love eco',      category: 'supermarket', country: 'Sweden',         color: 'oklch(0.55 0.13 22)' },
+  { id: 'Coop-SE',    name: 'Coop',            tag: 'Full-range · Änglamark bio',   category: 'supermarket', country: 'Sweden',         color: 'oklch(0.50 0.13 248)' },
+  { id: 'Lidl-SE',    name: 'Lidl',            tag: 'Discount · organic range',     category: 'discount',    country: 'Sweden',         color: 'oklch(0.58 0.13 50)' },
+  { id: 'NaturK',     name: 'Naturkompaniet',  tag: 'Health & outdoor nutrition',   category: 'pharmacy',    country: 'Sweden',         color: 'oklch(0.52 0.10 140)' },
+  // USA
+  { id: 'WholeFoods', name: 'Whole Foods',     tag: 'Organic & natural',            category: 'organic',     country: 'United States',  color: 'oklch(0.48 0.10 145)' },
+  { id: 'TraderJoes', name: "Trader Joe's",    tag: 'Affordable specialty',         category: 'supermarket', country: 'United States',  color: 'oklch(0.55 0.12 22)' },
+  { id: 'Kroger',     name: 'Kroger',          tag: 'Full-range · Simple Truth',    category: 'supermarket', country: 'United States',  color: 'oklch(0.50 0.12 248)' },
+  { id: 'Sprouts',    name: 'Sprouts',         tag: 'Natural & organic',            category: 'organic',     country: 'United States',  color: 'oklch(0.52 0.10 140)' },
+  { id: 'Target-US',  name: 'Target',          tag: 'Good & Gather organic line',   category: 'supermarket', country: 'United States',  color: 'oklch(0.55 0.14 22)' },
+  { id: 'iHerb',      name: 'iHerb',           tag: 'Online supplements & seeds',   category: 'pharmacy',    country: 'United States',  color: 'oklch(0.50 0.10 145)' },
+  // Australia
+  { id: 'Woolworths', name: 'Woolworths',      tag: 'Full-range · Macro organic',   category: 'supermarket', country: 'Australia',      color: 'oklch(0.50 0.10 145)' },
+  { id: 'Coles',      name: 'Coles',           tag: 'Full-range · organic range',   category: 'supermarket', country: 'Australia',      color: 'oklch(0.55 0.13 22)' },
+  { id: 'Aldi-AU',    name: 'Aldi',            tag: 'Discount · Just Organic',      category: 'discount',    country: 'Australia',      color: 'oklch(0.55 0.13 248)' },
+  { id: 'HarrisFarm', name: 'Harris Farm',     tag: 'Fresh produce & specialty',    category: 'organic',     country: 'Australia',      color: 'oklch(0.52 0.10 140)' },
+  // India
+  { id: 'NaturesB',   name: "Nature's Basket", tag: 'Premium & organic',            category: 'organic',     country: 'India',          color: 'oklch(0.52 0.10 140)' },
+  { id: 'Reliance',   name: 'Reliance Fresh',  tag: 'Fresh produce & staples',      category: 'supermarket', country: 'India',          color: 'oklch(0.50 0.13 22)' },
+  { id: 'BigBazaar',  name: 'Big Bazaar',      tag: 'Hypermarket · wide range',     category: 'supermarket', country: 'India',          color: 'oklch(0.55 0.13 248)' },
+  { id: 'Bigbasket',  name: 'BigBasket',       tag: 'Online grocery · organic line',category: 'organic',     country: 'India',          color: 'oklch(0.50 0.10 145)' },
+  // Sri Lanka
+  { id: 'Keells',     name: 'Keells',          tag: 'Full-range supermarket',       category: 'supermarket', country: 'Sri Lanka',      color: 'oklch(0.50 0.13 22)' },
+  { id: 'Cargills',   name: 'Cargills Food City', tag: 'Wide-range · island-wide', category: 'supermarket', country: 'Sri Lanka',      color: 'oklch(0.55 0.12 248)' },
+  { id: 'Laugfs',     name: 'Laugfs',          tag: 'Supermarket chain',            category: 'supermarket', country: 'Sri Lanka',      color: 'oklch(0.55 0.10 145)' },
 ];
 
+// Returns stores for a given country
+function storesForCountry(country) {
+  const stores = SUPERMARKETS.filter(s => s.country === country);
+  return stores.length ? stores : SUPERMARKETS.filter(s => s.country === 'Germany'); // fallback
+}
+
 const STORE_CATEGORIES = [
-  { id: 'supermarket', label: 'Supermarkets',       sub: 'Full-range, weekly shop' },
-  { id: 'discount',    label: 'Discounters',        sub: 'Lower-priced staples + house-brand Bio' },
+  { id: 'supermarket', label: 'Supermarkets',        sub: 'Full-range, weekly shop' },
+  { id: 'discount',    label: 'Discounters',         sub: 'Lower-priced staples with organic lines' },
   { id: 'organic',     label: 'Organic specialists', sub: 'Whole foods, bulk bins, fresh produce' },
-  { id: 'drugstore',   label: 'Drogerie',            sub: 'Seeds, oils, supplements, dry pantry' },
+  { id: 'pharmacy',    label: 'Health & pharmacy',   sub: 'Seeds, oils, supplements, dry pantry' },
 ];
 
 const STORE_BRAND = {
@@ -2618,6 +2667,103 @@ function bestStoreFor(item, profileMarkets) {
     if (hit) return hit;
   }
   return profileMarkets[0];
+}
+
+// ─── Seasonal vegetables by region & month ───────────────────────────────────
+// Regions: 'n-temperate' | 'nordic' | 'mediterranean' | 'tropical' | 'southern'
+const COUNTRY_REGION = {
+  'Germany': 'n-temperate', 'Austria': 'n-temperate', 'Switzerland': 'n-temperate',
+  'United Kingdom': 'n-temperate', 'Ireland': 'n-temperate',
+  'France': 'n-temperate', 'Belgium': 'n-temperate', 'Netherlands': 'n-temperate',
+  'United States': 'n-temperate', 'Canada': 'n-temperate',
+  'Sweden': 'nordic', 'Norway': 'nordic', 'Denmark': 'nordic', 'Finland': 'nordic',
+  'Italy': 'mediterranean', 'Spain': 'mediterranean', 'Greece': 'mediterranean',
+  'Portugal': 'mediterranean', 'Turkey': 'mediterranean',
+  'India': 'tropical', 'Sri Lanka': 'tropical', 'Thailand': 'tropical',
+  'Vietnam': 'tropical', 'Nigeria': 'tropical', 'Ghana': 'tropical',
+  'Australia': 'southern', 'New Zealand': 'southern', 'South Africa': 'southern',
+  'Argentina': 'southern', 'Chile': 'southern',
+};
+
+// month is 0-indexed (JS Date.getMonth())
+const SEASONAL_VEG = {
+  'n-temperate': {
+    0:  { season: 'Winter',        veg: [{ name: 'Celeriac', note: 'Rich in vitamin K2 for bone health' }, { name: 'Kale', note: 'Highest magnesium of any winter green' }, { name: 'Leeks', note: 'Prebiotic FOS feeds Lactobacillus' }, { name: 'Beetroot', note: 'Supports liver detox of excess estrogen' }, { name: 'Parsnips', note: 'Inulin-rich prebiotic fibre' }] },
+    1:  { season: 'Late Winter',   veg: [{ name: 'Kale', note: 'Peaks after frost — sweetens and concentrates nutrients' }, { name: 'Purple sprouting broccoli', note: 'DIM content supports estrogen metabolism' }, { name: 'Forced rhubarb', note: 'Oxalic acid aids bile flow and fat digestion' }, { name: 'Leeks', note: 'Gentle prebiotic, easy on the luteal gut' }, { name: 'Swede', note: 'Glucosinolates support liver phase II detox' }] },
+    2:  { season: 'Early Spring',  veg: [{ name: 'Purple sprouting broccoli', note: 'Sulforaphane activates NRF2, anti-inflammatory' }, { name: 'Spring greens', note: 'Folate peaks in new growth — key for follicular phase' }, { name: 'Wild garlic', note: 'Allicin supports progesterone-clearing liver enzymes' }, { name: 'Spinach', note: 'Iron + vitamin C combo — pair together for absorption' }, { name: 'Radishes', note: 'Stimulate bile production, aid estrogen clearance' }] },
+    3:  { season: 'Spring',        veg: [{ name: 'Asparagus', note: 'Prebiotic inulin + folate; classic spring fertility food' }, { name: 'Spring onions', note: 'Quercetin reduces histamine — helpful around ovulation' }, { name: 'Peas', note: 'Plant protein + B1 for energy metabolism' }, { name: 'Spinach', note: 'Magnesium and iron at peak spring levels' }, { name: 'Watercress', note: 'Highest glucosinolate content of any UK/EU green' }] },
+    4:  { season: 'Late Spring',   veg: [{ name: 'Asparagus', note: 'Peak season — eat daily while it lasts' }, { name: 'Broad beans', note: 'L-dopa precursor, dopamine support' }, { name: 'Courgette flowers', note: 'Zinc-rich pollen; anti-inflammatory carotenoids' }, { name: 'Radishes', note: 'Liver support, aids estrogen detox pathways' }, { name: 'New potatoes', note: 'Resistant starch after cooling — gut prebiotic' }] },
+    5:  { season: 'Early Summer',  veg: [{ name: 'Courgette', note: 'High water content, cooling for ovulatory heat' }, { name: 'Broad beans', note: 'Peak season protein + fibre' }, { name: 'Fennel', note: 'Phytoestrogens + carminative — reduce bloating' }, { name: 'Strawberries', note: 'Ellagitannins convert to urolithins in the gut' }, { name: 'Peas', note: 'Eat fresh — B-vitamins degrade quickly after picking' }] },
+    6:  { season: 'Summer',        veg: [{ name: 'Tomatoes', note: 'Lycopene highest in cooked tomatoes — estrogen-protective' }, { name: 'Cucumber', note: 'Silica supports collagen; cooling for luteal inflammation' }, { name: 'Runner beans', note: 'Folate + iron in peak summer form' }, { name: 'Beetroot', note: 'Nitrates improve blood flow and mitochondrial efficiency' }, { name: 'Courgette', note: 'Potassium helps offset luteal water retention' }] },
+    7:  { season: 'High Summer',   veg: [{ name: 'Sweetcorn', note: 'Zeaxanthin for eye & hormonal tissue protection' }, { name: 'Aubergine', note: 'Nasunin antioxidant protects cell membranes' }, { name: 'Tomatoes', note: 'Peak lycopene — eat with olive oil to unlock it' }, { name: 'Peppers', note: 'Highest vitamin C content of any veg — 2× an orange' }, { name: 'Chard', note: 'Magnesium + betalains reduce oxidative stress' }] },
+    8:  { season: 'Late Summer',   veg: [{ name: 'Squash', note: 'Beta-carotene → progesterone pathway support' }, { name: 'Sweetcorn', note: 'Last of the season — freeze the surplus' }, { name: 'Aubergine', note: 'Anti-androgenic; helpful for PCOS' }, { name: 'Leeks', note: 'New season starting — prebiotic FOS at peak' }, { name: 'Chard', note: 'Rich in magnesium as luteal phase approaches' }] },
+    9:  { season: 'Autumn',        veg: [{ name: 'Squash & pumpkin', note: 'Pumpkin seeds have peak zinc — key for progesterone' }, { name: 'Celeriac', note: 'Unique phthalides support adrenal/cortisol balance' }, { name: 'Leeks', note: 'Inulin prebiotic — feed your estrobolome' }, { name: 'Kale', note: 'Just-frosted kale has highest glucosinolates' }, { name: 'Beetroot', note: 'Betaine supports liver methylation of estrogen' }] },
+    10: { season: 'Late Autumn',   veg: [{ name: 'Kale', note: 'Frost converts starch to sugar — most nutritious now' }, { name: 'Brussels sprouts', note: 'Indole-3-carbinol directly supports estrogen clearance' }, { name: 'Squash', note: 'Carotenoids peak in storage — eat well into winter' }, { name: 'Celeriac', note: 'Vitamin C + phosphorus combination' }, { name: 'Parsnips', note: 'Prebiotic inulin at seasonal peak' }] },
+    11: { season: 'Winter',        veg: [{ name: 'Brussels sprouts', note: 'DIM and I3C highest when freshly harvested' }, { name: 'Red cabbage', note: 'Anthocyanins modulate insulin receptor sensitivity' }, { name: 'Kale', note: 'Essential magnesium through the winter months' }, { name: 'Celeriac', note: 'Stores well; complex carb with low GI' }, { name: 'Leeks', note: 'Warming prebiotic for the gut through winter' }] },
+  },
+  'nordic': {
+    0:  { season: 'Deep Winter',   veg: [{ name: 'Stored root veg (carrot, turnip, swede)', note: 'Preserved carotenoids through long winter storage' }, { name: 'Kale', note: 'Survives frost — most concentrated nutrients' }, { name: 'Dried lingonberries', note: 'Polyphenols support gut diversity in winter' }] },
+    1:  { season: 'Deep Winter',   veg: [{ name: 'Kale', note: 'Iron and calcium at peak after frost' }, { name: 'Celeriac', note: 'Energy-dense root for dark months' }, { name: 'Red cabbage', note: 'Anthocyanin antioxidants support hormonal detox' }] },
+    2:  { season: 'Late Winter',   veg: [{ name: 'Forced rhubarb', note: 'First fresh produce of the year — oxalic acid aids bile' }, { name: 'Kale', note: 'Still in season until April' }, { name: 'Leeks', note: 'Prebiotic FOS for gut health' }] },
+    3:  { season: 'Spring',        veg: [{ name: 'Spring onions', note: 'First alliums of the year — quercetin anti-inflammatory' }, { name: 'Spinach', note: 'Folate and iron; perfect for follicular support' }, { name: 'Nettles', note: 'Highest iron content of any foraged green' }] },
+    4:  { season: 'Spring',        veg: [{ name: 'Asparagus', note: 'Short but intense Nordic season — eat it daily' }, { name: 'New potatoes', note: 'Resistant starch when cooled' }, { name: 'Wild garlic', note: 'Allicin liver support for estrogen clearance' }] },
+    5:  { season: 'Early Summer',  veg: [{ name: 'Peas', note: 'Nordic peas are especially sweet — B-vitamins peak' }, { name: 'Lettuce', note: 'Lactucin has mild sedative effect for luteal anxiety' }, { name: 'Radishes', note: 'Liver-supportive glucosinolates' }] },
+    6:  { season: 'Summer',        veg: [{ name: 'Courgette', note: 'Potassium and silica for luteal phase support' }, { name: 'Beetroot', note: 'Nitrates + betaine; estrogen methylation support' }, { name: 'Broad beans', note: 'High protein peak harvest' }, { name: 'Strawberries', note: 'Ellagic acid microbiome support' }] },
+    7:  { season: 'High Summer',   veg: [{ name: 'Blueberries', note: 'Nordic wild blueberries have 3× the anthocyanins of cultivated' }, { name: 'Chanterelles', note: 'Vitamin D — rare in Nordic summer produce' }, { name: 'Courgette', note: 'Cooling; high water for summer heat' }] },
+    8:  { season: 'Late Summer',   veg: [{ name: 'Lingonberries', note: 'Arbutin content supports kidney and hormonal balance' }, { name: 'Kale', note: 'New season — harvest before first frost for peak DIM' }, { name: 'Root vegetables begin', note: 'Harvest season starts — carotenoids in storage veg' }] },
+    9:  { season: 'Autumn',        veg: [{ name: 'Squash', note: 'Pumpkin seeds: highest zinc for progesterone synthesis' }, { name: 'Root vegetables', note: 'Carrot, turnip, swede — carotenoids and prebiotic fibre' }, { name: 'Chanterelles', note: 'Last mushrooms of the year — vitamin D' }] },
+    10: { season: 'Late Autumn',   veg: [{ name: 'Brussels sprouts', note: 'I3C supports estrogen clearance via liver' }, { name: 'Kale', note: 'First frost improves sweetness and glucosinolates' }, { name: 'Stored carrots', note: 'Beta-carotene converts to vitamin A for thyroid health' }] },
+    11: { season: 'Winter',        veg: [{ name: 'Red cabbage', note: 'Anthocyanins through the dark months' }, { name: 'Kale', note: 'Iron and magnesium in winter form' }, { name: 'Dried/frozen lingonberries', note: 'Year-round gut microbiome support' }] },
+  },
+  'mediterranean': {
+    0:  { season: 'Winter',        veg: [{ name: 'Artichokes', note: 'Cynarin stimulates bile flow — powerful liver support' }, { name: 'Wild chicory', note: 'Inulin prebiotic at peak bitter winter form' }, { name: 'Blood oranges', note: 'Anthocyanins + vitamin C for immune and hormonal health' }, { name: 'Fennel', note: 'Phytoestrogens calm luteal symptoms' }, { name: 'Broccoli', note: 'DIM peaks in cool winter growing conditions' }] },
+    1:  { season: 'Winter',        veg: [{ name: 'Artichokes', note: 'Liver and gallbladder tonic — estrogen detox' }, { name: 'Broad beans', note: 'First fresh beans of the year — L-dopa precursor' }, { name: 'Wild greens (horta)', note: 'Foraged greens: highest wild mineral content' }, { name: 'Citrus', note: 'D-limonene in peel supports liver detox enzymes' }] },
+    2:  { season: 'Early Spring',  veg: [{ name: 'Asparagus', note: 'Mediterranean asparagus starts weeks before Northern Europe' }, { name: 'Broad beans', note: 'Peak harvest — protein and folate for follicular phase' }, { name: 'Peas', note: 'Fresh B-vitamins for energy metabolism' }, { name: 'Wild garlic', note: 'Allicin liver support' }] },
+    3:  { season: 'Spring',        veg: [{ name: 'Artichokes', note: 'Second harvest — liver support through spring detox' }, { name: 'Courgette', note: 'Early Mediterranean courgette — cooling and hydrating' }, { name: 'Tomatoes', note: 'Early varieties begin — lycopene estrogen protection' }, { name: 'Fresh herbs at peak', note: 'Parsley, oregano, thyme: antioxidants and anti-inflammatory' }] },
+    4:  { season: 'Late Spring',   veg: [{ name: 'Aubergine', note: 'Nasunin antioxidant; anti-androgenic for PCOS' }, { name: 'Courgette', note: 'Potassium for luteal bloat reduction' }, { name: 'Tomatoes', note: 'Cook with olive oil for maximum lycopene absorption' }, { name: 'Peppers', note: 'Vitamin C × 2 of an orange' }] },
+    5:  { season: 'Early Summer',  veg: [{ name: 'Tomatoes', note: 'Lycopene peaks in full-sun ripened fruit' }, { name: 'Peppers', note: 'Capsaicin improves insulin sensitivity' }, { name: 'Courgette', note: 'High potassium, cooling for the heat' }, { name: 'Cucumber', note: 'Silica and hydration for skin and gut lining' }] },
+    6:  { season: 'Summer',        veg: [{ name: 'Aubergine', note: 'Anti-androgenic nasunin; roast for max absorption' }, { name: 'Tomatoes', note: 'Absolute peak — eat in abundance' }, { name: 'Okra', note: 'Mucilaginous — soothes gut lining, blood sugar stabiliser' }, { name: 'Watermelon rind', note: 'Citrulline supports nitric oxide and circulation' }] },
+    7:  { season: 'High Summer',   veg: [{ name: 'Sweetcorn', note: 'Zeaxanthin for tissue protection' }, { name: 'Figs', note: 'Phytoestrogen-rich; iron and calcium' }, { name: 'Peppers', note: 'Peak capsaicin; insulin-sensitising effects highest' }, { name: 'Aubergine', note: 'Anti-inflammatory nasunin at peak' }] },
+    8:  { season: 'Late Summer',   veg: [{ name: 'Grapes', note: 'Resveratrol supports estrogen balance' }, { name: 'Figs', note: 'Natural prebiotic pectin + phytoestrogens' }, { name: 'Tomatoes', note: 'Last of season — make sauce and freeze' }, { name: 'Squash begins', note: 'Beta-carotene → progesterone pathway' }] },
+    9:  { season: 'Autumn',        veg: [{ name: 'Mushrooms (porcini)', note: 'Beta-glucans for immune and gut microbiome diversity' }, { name: 'Pomegranate', note: 'Punicalagins → urolithins → mitochondrial support' }, { name: 'Quince', note: 'Pectin prebiotic + tannins for gut lining integrity' }, { name: 'Artichokes return', note: 'Cynarin for liver support ahead of winter' }] },
+    10: { season: 'Late Autumn',   veg: [{ name: 'Artichokes', note: 'Peak autumn liver and bile support' }, { name: 'Cardoons', note: 'Wild artichoke relative — bitter liver tonic' }, { name: 'Mushrooms', note: 'Beta-glucans peak in autumn mushrooms' }, { name: 'Pomegranate', note: 'Final harvest — freeze seeds for winter' }] },
+    11: { season: 'Early Winter',  veg: [{ name: 'Broccoli', note: 'DIM for estrogen clearance in cool-grown veg' }, { name: 'Wild greens return', note: 'First foraged greens of the cool season' }, { name: 'Citrus begins', note: 'Vitamin C peaks in cool-ripened citrus' }, { name: 'Artichokes', note: 'Winter form — most potent liver tonic' }] },
+  },
+  'tropical': {
+    0:  { season: 'Cool/Dry',      veg: [{ name: 'Bitter gourd (karela)', note: 'Most studied plant for blood sugar regulation; IR superfood' }, { name: 'Drumstick (moringa)', note: 'Gram for gram: 4× calcium of milk, 3× iron of spinach' }, { name: 'Turmeric root', note: 'Fresh turmeric has 5× more curcumin than dried' }, { name: 'Curry leaves', note: 'Iron, calcium, B-vitamins; supports thyroid health' }, { name: 'Ash gourd', note: 'Cooling, gut-soothing; traditional Ayurvedic medicine' }] },
+    1:  { season: 'Cool/Dry',      veg: [{ name: 'Green jackfruit', note: 'Prebiotic fibre with a low GI — blood sugar stabilising' }, { name: 'Yam', note: 'Diosgenin content supports progesterone pathway' }, { name: 'Bitter gourd', note: 'Blood sugar regulation — best eaten at breakfast' }, { name: 'Banana blossom', note: 'Iron and tannins support menstrual health' }] },
+    2:  { season: 'Pre-Monsoon',   veg: [{ name: 'Raw mango', note: 'Vitamin C peaks before ripening — enhances iron absorption' }, { name: 'Drumstick pods', note: 'Isothiocyanates: liver and thyroid support' }, { name: 'Bitter gourd', note: 'Charantin lowers blood glucose post-meal' }, { name: 'Gongura / Sorrel', note: 'Iron, folate and anti-inflammatory tartaric acid' }] },
+    3:  { season: 'Pre-Monsoon',   veg: [{ name: 'Raw jackfruit', note: 'Fills up quickly — natural GLP-1 effect, reduces appetite' }, { name: 'Taro leaves', note: 'Highest calcium of any tropical leaf' }, { name: 'Cucumber begins', note: 'Cooling and hydrating before summer heat' }, { name: 'Amaranth leaves', note: 'Iron, calcium, complete amino acids' }] },
+    4:  { season: 'Hot Season',    veg: [{ name: 'Ash gourd', note: 'Cooling Ayurvedic vegetable for pitta season' }, { name: 'Cucumber', note: 'Silica and hydration; supports gut lining' }, { name: 'Snake gourd', note: 'Low GI, high fibre — blood sugar friendly' }, { name: 'Banana', note: 'Resistant starch (unripe) feeds Bifidobacterium' }] },
+    5:  { season: 'Early Monsoon', veg: [{ name: 'Colocasia / Taro', note: 'Calcium and potassium for PMS muscle cramps' }, { name: 'Drumstick', note: 'Phytochemicals peak in monsoon growth flush' }, { name: 'Green papaya', note: 'Papain enzyme supports protein digestion' }, { name: 'Curry leaves', note: 'Mahanimbine alkaloid for insulin sensitisation' }] },
+    6:  { season: 'Monsoon',       veg: [{ name: 'Ridge gourd', note: 'Mucilaginous; soothes inflamed gut lining' }, { name: 'Cluster beans (guar)', note: 'Highest guar gum content — powerful blood sugar stabiliser' }, { name: 'Pointed gourd', note: 'Traditional medicine for liver and digestion' }, { name: 'Bitter gourd', note: 'Year-round staple; most potent in monsoon season' }] },
+    7:  { season: 'Monsoon',       veg: [{ name: 'Yam', note: 'Diosgenin — phytochemical precursor to progesterone' }, { name: 'Colocasia', note: 'Calcium peaks in monsoon growth' }, { name: 'Moringa', note: 'Complete micronutrient profile — the ultimate supplement food' }, { name: 'Jackfruit', note: 'Prebiotic fibre at monsoon peak' }] },
+    8:  { season: 'Post-Monsoon',  veg: [{ name: 'Drumstick leaves', note: 'Highest post-monsoon nutrient density' }, { name: 'Green beans', note: 'Silicon and folate for bone and ovarian health' }, { name: 'Ash gourd', note: 'Detox support as monsoon clears' }, { name: 'Turmeric harvest begins', note: 'Fresh rhizomes available — use generously' }] },
+    9:  { season: 'Cool/Dry',      veg: [{ name: 'Bitter gourd', note: 'Cool-season bitter gourd has highest charantin' }, { name: 'Sweet potato', note: 'Adiponectin-boosting carotenoids' }, { name: 'Pumpkin / ash gourd', note: 'Beta-carotene → vitamin A → progesterone support' }, { name: 'Fenugreek leaves (methi)', note: 'Diosgenin phytoestrogen + blood sugar regulation' }] },
+    10: { season: 'Cool/Dry',      veg: [{ name: 'Fenugreek leaves', note: 'Peak season — mildest bitterness, highest diosgenin' }, { name: 'Spinach', note: 'Best cool-season spinach — iron and folate peak' }, { name: 'Coriander', note: 'Fresh coriander: anti-androgenic flavonoids' }, { name: 'Green peas', note: 'Short tropical cool season peas — eat fresh' }] },
+    11: { season: 'Cool/Dry',      veg: [{ name: 'Carrot', note: 'Raw carrot binds excess estrogen in the gut' }, { name: 'Beetroot', note: 'Betaine supports liver estrogen methylation' }, { name: 'Moringa', note: 'Cool-season moringa has most concentrated nutrients' }, { name: 'Tomato', note: 'Lycopene in cool-grown tomatoes; cook with oil to unlock' }] },
+  },
+  'southern': {
+    // Southern hemisphere — seasons reversed
+    0:  { season: 'Summer',        veg: [{ name: 'Tomatoes', note: 'Peak lycopene in full-sun southern summer' }, { name: 'Courgette', note: 'Cooling and hydrating through summer heat' }, { name: 'Corn', note: 'Zeaxanthin for tissue protection' }, { name: 'Capsicum', note: 'Highest vitamin C content; insulin-sensitising capsaicin' }, { name: 'Cucumber', note: 'Silica and hydration; gut lining support' }] },
+    1:  { season: 'Late Summer',   veg: [{ name: 'Aubergine', note: 'Nasunin antioxidant; anti-androgenic' }, { name: 'Sweetcorn', note: 'Last of the southern summer — freeze surplus' }, { name: 'Stone fruit', note: 'Ellagic acid and quercetin — hormonal tissue protection' }, { name: 'Beans', note: 'High protein at summer peak' }] },
+    2:  { season: 'Early Autumn',  veg: [{ name: 'Pumpkin', note: 'Beta-carotene; pumpkin seeds for progesterone zinc' }, { name: 'Squash', note: 'Harvest begins — store well into winter' }, { name: 'Tomatoes', note: 'Last harvest — batch cook and freeze' }, { name: 'Leeks', note: 'New season — prebiotic FOS for gut health' }] },
+    3:  { season: 'Autumn',        veg: [{ name: 'Broccoli', note: 'Cool-grown DIM content peaks in autumn' }, { name: 'Cauliflower', note: 'Indole-3-carbinol for estrogen clearance' }, { name: 'Silverbeet / Chard', note: 'Magnesium and betalains' }, { name: 'Beetroot', note: 'Betaine supports liver methylation' }] },
+    4:  { season: 'Late Autumn',   veg: [{ name: 'Kale', note: 'Magnesium and glucosinolates peak in cool growing' }, { name: 'Brussels sprouts', note: 'DIM and I3C for estrogen pathway support' }, { name: 'Celeriac', note: 'Vitamin K2 and phthalides for adrenal balance' }, { name: 'Parsnips', note: 'Inulin prebiotic fibre' }] },
+    5:  { season: 'Winter',        veg: [{ name: 'Kale', note: 'Winter kale most nutrient-dense after frost equivalent cold' }, { name: 'Leeks', note: 'Prebiotic peak in cold months' }, { name: 'Stored squash', note: 'Carotenoids increase during cold storage' }, { name: 'Silverbeet', note: 'Iron and magnesium through winter' }] },
+    6:  { season: 'Mid Winter',    veg: [{ name: 'Cabbage', note: 'Ferment as sauerkraut for winter probiotic supply' }, { name: 'Kale', note: 'Sulforaphane peaks in cold-grown kale' }, { name: 'Carrots', note: 'Beta-carotene for thyroid and adrenal support' }, { name: 'Parsnips', note: 'Inulin at winter peak' }] },
+    7:  { season: 'Late Winter',   veg: [{ name: 'Asparagus begins', note: 'First asparagus of the southern spring — inulin and folate' }, { name: 'Broccoli', note: 'Last of winter broccoli — high DIM' }, { name: 'Blood oranges', note: 'Anthocyanins in cool-ripened citrus' }] },
+    8:  { season: 'Early Spring',  veg: [{ name: 'Asparagus', note: 'Southern spring asparagus — eat daily' }, { name: 'Peas', note: 'Fresh spring peas — B-vitamins and folate' }, { name: 'Broad beans', note: 'L-dopa precursor; spring protein' }, { name: 'Spring onions', note: 'Quercetin reduces histamine' }] },
+    9:  { season: 'Spring',        veg: [{ name: 'Courgette', note: 'First spring courgettes — potassium and silica' }, { name: 'Fennel', note: 'Phytoestrogens and carminatives for bloating' }, { name: 'Strawberries', note: 'Ellagic acid → urolithins → gut-mitochondria support' }, { name: 'Spinach', note: 'Iron and magnesium at spring peak' }] },
+    10: { season: 'Late Spring',   veg: [{ name: 'Beetroot', note: 'Nitrates for blood flow and mitochondrial efficiency' }, { name: 'Radishes', note: 'Liver support; glucosinolates peak in spring growth' }, { name: 'Tomatoes begin', note: 'Early varieties for lycopene protection' }, { name: 'Courgette flowers', note: 'Zinc and anti-inflammatory carotenoids' }] },
+    11: { season: 'Early Summer',  veg: [{ name: 'Tomatoes', note: 'Southern summer sun → peak lycopene' }, { name: 'Capsicum', note: 'Highest vitamin C; capsaicin improving insulin sensitivity' }, { name: 'Cucumber', note: 'Cooling and hydrating as heat builds' }, { name: 'Corn', note: 'Zeaxanthin and resistant starch' }] },
+  },
+};
+
+function seasonalVegFor(country) {
+  const region = COUNTRY_REGION[country] || 'n-temperate';
+  const month  = new Date().getMonth();
+  return SEASONAL_VEG[region]?.[month] || { season: 'Year-round', veg: [] };
 }
 
 // Tag display config — color per tag family
@@ -2722,7 +2868,7 @@ Object.assign(window, {
   RECIPES, recipeById, PLAN_BY_PHASE, countPlantsToday,
   DIETS, ALLERGENS, ETHNICITIES, CUISINES, lifeStageFor,
   SUPERMARKETS, STORE_CATEGORIES, STORE_BRAND,
-  brandFor, bestStoreFor,
+  brandFor, bestStoreFor, storesForCountry, seasonalVegFor,
   TAG_STYLES, tagStyle, CARD_TAGS,
   RECIPE_CUISINE_FILTERS,
   HEALTH_CONDITIONS,

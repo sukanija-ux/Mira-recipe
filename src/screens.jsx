@@ -616,11 +616,14 @@ function Profile({ profile, setProfile, go }) {
 
       <Block title="Stores near you">
         <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
-          {window.STORE_CATEGORIES.map(cat => (
+          {window.STORE_CATEGORIES.map(cat => {
+            const countryStores = window.storesForCountry(profile.country || 'Germany').filter(s => s.category === cat.id);
+            if (!countryStores.length) return null;
+            return (
             <div key={cat.id}>
               <window.Eyebrow>{cat.label}</window.Eyebrow>
               <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 10 }}>
-                {window.SUPERMARKETS.filter(s => s.category === cat.id).map(s => {
+                {countryStores.map(s => {
                   const on = profile.markets.includes(s.id);
                   return (
                     <button key={s.id} onClick={() => setProfile({ ...profile, markets: on ? profile.markets.filter(x => x !== s.id) : [...profile.markets, s.id] })} style={{
@@ -638,7 +641,8 @@ function Profile({ profile, setProfile, go }) {
                 })}
               </div>
             </div>
-          ))}
+            );
+          })}
         </div>
       </Block>
 
