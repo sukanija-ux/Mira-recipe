@@ -34,6 +34,7 @@ function App() {
     pregnancyWeek:  12,
     postpartumWeek: 6,
     breastfeeding:  false,
+    mealPlan:       {},        // { 'YYYY-MM-DD': { breakfast, lunch, dinner } }
   });
 
   const [onboarded, setOnboarded] = useState(!tweaks.showOnboarding);
@@ -80,7 +81,7 @@ function App() {
     <div style={{ minHeight: '100vh', background: 'oklch(0.945 0.022 88)', color: 'oklch(0.28 0.040 145)' }}>
       <window.TopNav route={route} go={go} profile={profile} />
 
-      {route === 'home'    && <window.Dashboard     profile={profile} go={go} openRecipe={openRecipe} />}
+      {route === 'home'    && <window.Dashboard     profile={profile} setProfile={setProfile} go={go} openRecipe={openRecipe} />}
       {route === 'browse'  && <window.RecipeBrowse  profile={profile} openRecipe={openRecipe} />}
       {route === 'recipe'  && recipeId && <window.RecipeDetail id={recipeId} profile={profile} go={go} openRecipe={openRecipe} />}
       {route === 'cycle'   && <window.CycleCalendar profile={profile} go={go} setProfile={setProfile} />}
