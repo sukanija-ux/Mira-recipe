@@ -97,39 +97,57 @@ function Dashboard({ profile, setProfile, go, openRecipe }) {
 
       {/* ── Phase guidance ── */}
       <section style={{ marginBottom: 52 }}>
-        <window.Eyebrow style={{ marginBottom: 16 }}>Today's guidance · {phase.name} phase</window.Eyebrow>
-        <div style={{ display: 'grid', gridTemplateColumns: phase.movement ? '1fr 1fr 1fr' : '1fr 1fr', gap: 16, marginTop: 14 }}>
-          <div style={{ padding: '20px 22px', borderRadius: 16, background: phase.soft, border: `1px solid ${phase.color}28` }}>
-            <window.Eyebrow color={phase.color}>Gut focus</window.Eyebrow>
-            <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 13.5, lineHeight: 1.65, color: 'oklch(0.34 0.035 140)', margin: '10px 0 0' }}>{phase.gutFocus}</p>
+        <window.Eyebrow>Today's guidance · {phase.name} phase</window.Eyebrow>
+
+        {/* Gut + Ayurvedic — two different visual registers */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginTop: 16 }}>
+          {/* Gut: plain prose, tinted, no card frame */}
+          <div style={{ padding: '22px 24px', borderRadius: 16, background: phase.soft }}>
+            <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 13.5, lineHeight: 1.7, color: 'oklch(0.32 0.038 145)', margin: 0 }}>
+              <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 9.5, letterSpacing: '0.08em', color: phase.color, display: 'block', marginBottom: 8, textTransform: 'uppercase' }}>Gut</span>
+              {phase.gutFocus}
+            </p>
           </div>
-          <div style={{ padding: '20px 22px', borderRadius: 16, background: 'oklch(0.28 0.040 145)' }}>
-            <window.Eyebrow color="oklch(0.76 0.08 88)">Ayurvedic · {phase.dosha}</window.Eyebrow>
-            <p style={{ fontFamily: 'Instrument Serif, serif', fontSize: 15, lineHeight: 1.55, color: 'oklch(0.88 0.025 95)', margin: '10px 0 0', fontStyle: 'italic' }}>{phase.ayurvedicFocus}</p>
+
+          {/* Ayurvedic: dark, quote-like, serif — deliberately different register */}
+          <div style={{ padding: '22px 24px', borderRadius: 16, background: 'oklch(0.26 0.042 145)' }}>
+            <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 9.5, letterSpacing: '0.08em', color: 'oklch(0.68 0.07 88)', display: 'block', marginBottom: 10, textTransform: 'uppercase' }}>{phase.dosha}</span>
+            <p style={{ fontFamily: 'Instrument Serif, serif', fontSize: 16, lineHeight: 1.6, color: 'oklch(0.87 0.022 95)', margin: 0, fontStyle: 'italic' }}>
+              {phase.ayurvedicFocus}
+            </p>
           </div>
-          {phase.movement && (
-            <div style={{ padding: '20px 22px', borderRadius: 16, background: 'oklch(0.97 0.018 90)', border: '1px solid oklch(0.87 0.022 95)' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                <window.Eyebrow>Movement</window.Eyebrow>
-                <div style={{ textAlign: 'right' }}>
-                  <div style={{ fontFamily: 'Instrument Serif, serif', fontSize: 28, color: phase.color, lineHeight: 1, fontWeight: 400 }}>{phase.movement.intensity}</div>
-                  <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 9, color: 'oklch(0.56 0.030 135)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>{phase.movement.duration}</div>
-                </div>
-              </div>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, margin: '10px 0 8px' }}>
+        </div>
+
+        {/* Movement — horizontal strip, not a third card */}
+        {phase.movement && (
+          <div style={{ marginTop: 12, padding: '16px 20px', borderRadius: 14, border: '1px solid oklch(0.87 0.022 95)', display: 'grid', gridTemplateColumns: 'auto 1fr auto', gap: 24, alignItems: 'center' }}>
+            {/* Intensity + duration */}
+            <div style={{ borderRight: '1px solid oklch(0.88 0.022 95)', paddingRight: 24 }}>
+              <div style={{ fontFamily: 'Instrument Serif, serif', fontSize: 32, color: phase.color, lineHeight: 1, fontWeight: 400 }}>{phase.movement.intensity}</div>
+              <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 9, color: 'oklch(0.58 0.028 135)', marginTop: 4, letterSpacing: '0.08em', textTransform: 'uppercase' }}>{phase.movement.duration}</div>
+            </div>
+
+            {/* Activities + note */}
+            <div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 8 }}>
                 {phase.movement.best.map(m => (
-                  <span key={m} style={{ padding: '5px 10px', borderRadius: 999, background: phase.soft, border: `1px solid ${phase.color}30`, fontFamily: 'DM Sans, sans-serif', fontSize: 12, fontWeight: 500, color: 'oklch(0.34 0.04 140)' }}>{m}</span>
+                  <span key={m} style={{ padding: '4px 10px', borderRadius: 999, background: phase.soft, border: `1px solid ${phase.color}28`, fontFamily: 'DM Sans, sans-serif', fontSize: 12, fontWeight: 500, color: 'oklch(0.34 0.04 140)' }}>{m}</span>
                 ))}
               </div>
-              <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 12.5, lineHeight: 1.6, color: 'oklch(0.46 0.032 140)', margin: 0 }}>{phase.movement.note}</p>
-              {phase.movement.avoid.length > 0 && (
-                <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 9.5, color: 'oklch(0.56 0.030 135)', marginTop: 8, letterSpacing: '0.05em' }}>
-                  EASE OFF · {phase.movement.avoid.join(' · ')}
-                </p>
-              )}
+              <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 12.5, lineHeight: 1.6, color: 'oklch(0.48 0.030 140)', margin: 0 }}>{phase.movement.note}</p>
             </div>
-          )}
-        </div>
+
+            {/* Ease off */}
+            {phase.movement.avoid.length > 0 && (
+              <div style={{ borderLeft: '1px solid oklch(0.88 0.022 95)', paddingLeft: 24, maxWidth: 180 }}>
+                <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 8.5, color: 'oklch(0.60 0.025 135)', letterSpacing: '0.07em', marginBottom: 6, textTransform: 'uppercase' }}>Ease off</div>
+                {phase.movement.avoid.map(a => (
+                  <div key={a} style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 12, color: 'oklch(0.50 0.030 135)', lineHeight: 1.5 }}>{a}</div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
       </section>
 
       {/* ── Seasonal veg cards ── */}
