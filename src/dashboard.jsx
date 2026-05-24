@@ -1,18 +1,12 @@
 // Today / Dashboard screen
 
-const { useState: useState_DB, useEffect: useEffect_DB } = React;
+const { useState: useState_DB } = React;
 
 function Dashboard({ profile, go, openRecipe }) {
   const phase = window.phaseForDay(profile.day, profile.length);
   const plan  = window.PLAN_BY_PHASE[phase.id];
   const proteinTarget = Math.round((profile.height - 100) * 1.5);
   const perMeal       = Math.round(proteinTarget / profile.meals);
-
-  const [hoursSince, setHoursSince] = useState_DB(3.2);
-  useEffect_DB(() => {
-    const t = setInterval(() => setHoursSince(h => h + 1 / 60), 1000);
-    return () => clearInterval(t);
-  }, []);
 
   const mealsList = profile.meals === 2
     ? [
@@ -25,14 +19,10 @@ function Dashboard({ profile, go, openRecipe }) {
         { key: 'dinner',    label: 'Dinner',    time: '19:00', r: window.recipeById(plan.dinner) },
       ];
 
-  const nextMealReady = hoursSince >= 4;
-  const mmcActive     = hoursSince >= 4;
   const stage = window.lifeStageFor(profile.age);
   const stageNote = stage.id !== 'reproductive' ? ` · ${stage.label} adjustments applied.` : '';
 
-  const plantsToday   = window.countPlantsToday(plan);
-  const weeklyPct     = Math.round((plantsToday / 30) * 100);
-
+  const plantsToday = window.countPlantsToday(plan);
   const tones = ['clay', 'sage', 'honey', 'plum'];
 
   return (
@@ -57,12 +47,9 @@ function Dashboard({ profile, go, openRecipe }) {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 48 }}>
           <Stat label="Daily protein" value={`${proteinTarget}g`} sub={`${perMeal}g per meal · ${profile.meals}× a day`} />
           <Stat
-            label="Last meal"
-            value={`${hoursSince.toFixed(1)}h`}
-            sub={mmcActive
-              ? `MMC gut-clearing window active · ${hoursSince.toFixed(1)}h fasted`
-              : `${(4 - hoursSince).toFixed(1)}h until MMC window opens`}
-            accent={mmcActive ? 'oklch(0.58 0.08 138)' : phase.color}
+            label="Meal spacing"
+            value="4–6h"
+            sub="Leave 4–6 hours between meals to let your gut clear. Avoid snacking."
           />
           <Stat
             label="Carb permission"
@@ -158,26 +145,19 @@ function Dashboard({ profile, go, openRecipe }) {
         </div>
       </section>
 
-      {/* Seed cycling + 30-plants footer */}
-      <section style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 40, paddingTop: 28, borderTop: '1px solid oklch(0.86 0.025 95)', alignItems: 'center' }}>
+      {/* Hints footer */}
+      <section style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 40, paddingTop: 28, borderTop: '1px solid oklch(0.86 0.025 95)', alignItems: 'start' }}>
         <div>
           <window.Eyebrow>Today's seed cycling</window.Eyebrow>
-          <div style={{ fontFamily: 'Instrument Serif, serif', fontSize: 28, color: 'oklch(0.28 0.040 145)', marginTop: 6, fontStyle: 'italic' }}>
+          <div style={{ fontFamily: 'Instrument Serif, serif', fontSize: 26, color: 'oklch(0.28 0.040 145)', marginTop: 6, fontStyle: 'italic' }}>
             {phase.seed}
           </div>
         </div>
         <div>
-          <window.Eyebrow>Plant diversity · 30/week goal</window.Eyebrow>
-          <div style={{ marginTop: 10, display: 'flex', alignItems: 'baseline', gap: 10 }}>
-            <span style={{ fontFamily: 'Instrument Serif, serif', fontSize: 42, color: 'oklch(0.58 0.09 140)', lineHeight: 1 }}>{plantsToday}</span>
-            <span style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 13.5, color: 'oklch(0.50 0.035 135)' }}>plants today · {weeklyPct}% of weekly goal</span>
-          </div>
-          <div style={{ marginTop: 8, height: 4, borderRadius: 999, background: 'oklch(0.88 0.025 95)', overflow: 'hidden' }}>
-            <div style={{ height: '100%', borderRadius: 999, background: 'oklch(0.58 0.09 140)', width: `${Math.min(weeklyPct, 100)}%`, transition: 'width 0.4s ease' }} />
-          </div>
-          <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 9.5, color: 'oklch(0.54 0.035 135)', marginTop: 5, letterSpacing: '0.08em' }}>
-            {plantsToday >= 4 ? 'GREAT DAY · 4+ PLANTS THRESHOLD MET' : `ADD ${4 - plantsToday} MORE PLANTS TODAY`}
-          </div>
+          <window.Eyebrow>Plant diversity hint</window.Eyebrow>
+          <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 13.5, lineHeight: 1.6, color: 'oklch(0.46 0.035 135)', marginTop: 8 }}>
+            Aim for 30 different plants a week. Today's plan includes <strong style={{ color: 'oklch(0.36 0.06 140)' }}>{plantsToday} plants</strong> — add variety through herbs, spices, nuts, and seeds to hit your target.
+          </p>
         </div>
         <div style={{ textAlign: 'right' }}>
           <button onClick={() => go('profile')} style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'DM Sans, sans-serif', fontSize: 14, color: 'oklch(0.50 0.035 135)' }}>
