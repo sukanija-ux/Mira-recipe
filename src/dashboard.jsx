@@ -120,6 +120,22 @@ function Dashboard({ profile, go, openRecipe }) {
             </article>
           ))}
         </div>
+
+        {/* Meal-adjacent hints — seed cycling + plant diversity */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginTop: 12 }}>
+          <div style={{ padding: '14px 18px', borderRadius: 12, background: 'oklch(0.97 0.015 90)', border: '1px solid oklch(0.88 0.022 95)', display: 'flex', alignItems: 'baseline', gap: 14 }}>
+            <window.Eyebrow style={{ flexShrink: 0 }}>Seed cycling</window.Eyebrow>
+            <span style={{ fontFamily: 'Instrument Serif, serif', fontSize: 17, color: 'oklch(0.28 0.040 145)', fontStyle: 'italic' }}>
+              {phase.seed}
+            </span>
+          </div>
+          <div style={{ padding: '14px 18px', borderRadius: 12, background: 'oklch(0.97 0.015 90)', border: '1px solid oklch(0.88 0.022 95)', display: 'flex', alignItems: 'baseline', gap: 14 }}>
+            <window.Eyebrow style={{ flexShrink: 0 }}>Plants today</window.Eyebrow>
+            <span style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 13, color: 'oklch(0.48 0.032 135)' }}>
+              <strong style={{ color: 'oklch(0.36 0.06 140)', fontWeight: 600 }}>{plantsToday}</strong> in today's meals — aim for 30 different plants a week
+            </span>
+          </div>
+        </div>
       </section>
 
       {/* ── Zone 4: Phase guidance — gut · ayurveda · movement in one row ── */}
@@ -177,39 +193,19 @@ function Dashboard({ profile, go, openRecipe }) {
         </div>
       </section>
 
-      {/* ── Zone 5: Daily hints footer ── */}
+      {/* ── Zone 5: Seasonal veg footer ── */}
       <section style={{
-        display: 'grid',
-        gridTemplateColumns: seasonal && seasonal.veg && seasonal.veg.length ? '1fr 1fr 2fr auto' : '1fr 1fr auto',
+        display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start',
         gap: 40, paddingTop: 28,
         borderTop: '1px solid oklch(0.87 0.022 95)',
-        alignItems: 'start',
       }}>
-
-        {/* Seed cycling */}
-        <div>
-          <window.Eyebrow>Seed cycling</window.Eyebrow>
-          <div style={{ fontFamily: 'Instrument Serif, serif', fontSize: 22, color: 'oklch(0.28 0.040 145)', marginTop: 6, fontStyle: 'italic' }}>
-            {phase.seed}
-          </div>
-        </div>
-
-        {/* Plant diversity */}
-        <div>
-          <window.Eyebrow>Plant diversity</window.Eyebrow>
-          <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 13, lineHeight: 1.6, color: 'oklch(0.48 0.032 135)', marginTop: 7 }}>
-            Today's plan has <strong style={{ color: 'oklch(0.36 0.06 140)' }}>{plantsToday} plants</strong>. Aim for 30 a week — add herbs, spices, nuts and seeds to build variety.
-          </p>
-        </div>
-
-        {/* Seasonal veg */}
-        {seasonal && seasonal.veg && seasonal.veg.length > 0 && (
-          <div>
-            <window.Eyebrow>In season · {seasonal.season}</window.Eyebrow>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 8 }}>
+        {seasonal && seasonal.veg && seasonal.veg.length > 0 ? (
+          <div style={{ flex: 1 }}>
+            <window.Eyebrow>In season · {seasonal.season} · {profile.country || 'your area'}</window.Eyebrow>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 10 }}>
               {seasonal.veg.map(v => (
                 <span key={v.name} title={v.note} style={{
-                  padding: '4px 10px', borderRadius: 999,
+                  padding: '5px 12px', borderRadius: 999,
                   background: phase.soft, border: `1px solid ${phase.color}28`,
                   fontFamily: 'DM Sans, sans-serif', fontSize: 12.5, fontWeight: 500,
                   color: 'oklch(0.34 0.038 140)', cursor: 'default',
@@ -218,21 +214,18 @@ function Dashboard({ profile, go, openRecipe }) {
                 </span>
               ))}
             </div>
-            <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 11.5, color: 'oklch(0.52 0.030 135)', marginTop: 7, lineHeight: 1.5 }}>
+            <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 11.5, color: 'oklch(0.54 0.028 135)', marginTop: 8 }}>
               Hover any veg for its hormonal benefit.
             </p>
           </div>
-        )}
+        ) : <div />}
 
-        {/* Profile link */}
-        <div style={{ textAlign: 'right', paddingTop: 4 }}>
-          <button
-            onClick={() => go('profile')}
-            style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'DM Sans, sans-serif', fontSize: 13.5, color: 'oklch(0.50 0.035 135)' }}
-          >
-            Your profile →
-          </button>
-        </div>
+        <button
+          onClick={() => go('profile')}
+          style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'DM Sans, sans-serif', fontSize: 13.5, color: 'oklch(0.50 0.035 135)', paddingTop: 4, flexShrink: 0 }}
+        >
+          Your profile →
+        </button>
       </section>
     </div>
   );
