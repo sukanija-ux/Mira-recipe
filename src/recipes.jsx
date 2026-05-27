@@ -127,11 +127,12 @@ function AddToPlanPicker({ recipe, profile, setProfile, onClose }) {
 
 // ── Week planner (slot picker uses existing RecipePicker-style inline search) ──
 
-function WeekSlotPicker({ slot, onSelect, onClose, isIR }) {
+function WeekSlotPicker({ slot, onSelect, onClose, isIR, perMeal }) {
   const [query, setQuery] = useState_R('');
   const inputRef = useRef_R(null);
   useEffect_R(() => { inputRef.current?.focus(); }, []);
-  const pool = isIR ? window.irFilterRecipes(window.RECIPES) : window.RECIPES;
+  let pool = isIR ? window.irFilterRecipes(window.RECIPES) : window.RECIPES;
+  pool = pool.filter(r => (r.protein || 0) >= (perMeal || 0));
   const recipes = pool.filter(r =>
     !query || r.title.toLowerCase().includes(query.toLowerCase()) || (r.cuisine || '').toLowerCase().includes(query.toLowerCase())
   );
@@ -170,6 +171,7 @@ function WeekSlotPicker({ slot, onSelect, onClose, isIR }) {
 
 function WeekPlanner({ profile, setProfile, phase }) {
   const isIR      = (profile.conditions || []).includes('insulin-resistance');
+  const perMeal   = Math.round(Math.round((profile.height - 100) * 1.5) / profile.meals);
   const today     = new Date(); today.setHours(0,0,0,0);
   const todayKey  = dateKeyR(today);
   const days      = Array.from({ length: 7 }, (_, i) => addDaysR(today, i));
@@ -236,6 +238,7 @@ function WeekPlanner({ profile, setProfile, phase }) {
           onSelect={id => { setMeal(picker.dateKey, picker.meal, id); setPicker(null); }}
           onClose={() => setPicker(null)}
           isIR={isIR}
+          perMeal={perMeal}
         />
       )}
     </>
@@ -245,18 +248,21 @@ function WeekPlanner({ profile, setProfile, phase }) {
 // ── Recipe browse ─────────────────────────────────────────────────────────────
 
 function RecipeBrowse({ profile, setProfile, openRecipe }) {
-  const phase   = window.phaseForDay(profile.day, profile.length);
-  const isIR    = (profile.conditions || []).includes('insulin-resistance');
+  const phase    = window.phaseForDay(profile.day, profile.length);
+  const isIR     = (profile.conditions || []).includes('insulin-resistance');
+  const perMeal  = Math.round(Math.round((profile.height - 100) * 1.5) / profile.meals);
   const [filter,     setFilter]     = useState_R('phase');
   const [meal,       setMeal]       = useState_R('all');
   const [cuisine,    setCuisine]    = useState_R('all');
   const [condFilter, setCondFilter] = useState_R('all');
   const [planRecipe, setPlanRecipe] = useState_R(null); // recipe object for AddToPlanPicker
 
-  // Base pool: exclude high-starch recipes for IR users
+  // Base pool: exclude high-starch (IR) and below-protein-target recipes
   const baseRecipes = useMemo_R(() => {
-    return isIR ? window.irFilterRecipes(window.RECIPES) : window.RECIPES;
-  }, [isIR]);
+    let pool = isIR ? window.irFilterRecipes(window.RECIPES) : window.RECIPES;
+    pool = pool.filter(r => (r.protein || 0) >= perMeal);
+    return pool;
+  }, [isIR, perMeal]);
 
   const conditionTags = useMemo_R(() => {
     const conditions = profile.conditions || [];
@@ -292,7 +298,7 @@ function RecipeBrowse({ profile, setProfile, openRecipe }) {
       </div>
 
       <header style={{ marginBottom: isIR ? 24 : 56, paddingTop: 16, borderTop: '1px solid oklch(0.87 0.022 95)' }}>
-        <window.Eyebrow>Recipe library · {list.length} of {baseRecipes.length}{isIR ? ' · starchy recipes hidden' : ''}</window.Eyebrow>
+        <window.Eyebrow>Recipe library · {list.length} of {baseRecipes.length} · ≥{perMeal}g protein per meal{isIR ? ' · starchy hidden' : ''}</window.Eyebrow>
         <h1 style={{ fontFamily: 'Instrument Serif, serif', fontSize: 72, lineHeight: 0.98, color: 'oklch(0.28 0.040 145)', margin: '18px 0 0', fontWeight: 400 }}>
           <em>Real</em> recipes, from real kitchens.
         </h1>

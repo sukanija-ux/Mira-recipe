@@ -9,14 +9,20 @@ function Dashboard({ profile, setProfile, go, openRecipe }) {
   const perMeal       = Math.round(proteinTarget / profile.meals);
   const isIR          = (profile.conditions || []).includes('insulin-resistance');
 
-  // For IR users: if the phase plan picks a starchy recipe, replace with the
-  // first IR-safe recipe that is appropriate for this phase (or globally safe).
-  const irSafePool = isIR ? window.irFilterRecipes(window.RECIPES) : null;
+  // Pool respecting both IR and protein floor
+  const safePool = (() => {
+    let pool = isIR ? window.irFilterRecipes(window.RECIPES) : window.RECIPES;
+    pool = pool.filter(r => (r.protein || 0) >= perMeal);
+    return pool;
+  })();
+
   function safeRecipe(id) {
     const r = window.recipeById(id);
-    if (!isIR || !window.STARCHY_IDS?.has(id)) return r;
-    // Prefer phase-appropriate; fall back to any safe recipe
-    return irSafePool?.find(x => x.phases?.includes(phase.id)) || irSafePool?.[0] || r;
+    const starchy = window.STARCHY_IDS?.has(id);
+    const tooLow  = (r?.protein || 0) < perMeal;
+    if (!starchy && !tooLow) return r;
+    // Substitute: prefer phase-appropriate safe recipe; fall back to any
+    return safePool.find(x => x.phases?.includes(phase.id)) || safePool[0] || r;
   }
 
   const mealsList = profile.meals === 2
