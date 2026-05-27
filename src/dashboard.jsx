@@ -9,31 +9,34 @@ function Dashboard({ profile, setProfile, go, openRecipe }) {
   const perMeal       = Math.round(proteinTarget / profile.meals);
   const isIR          = (profile.conditions || []).includes('insulin-resistance');
 
-  // Pool respecting both IR and protein floor
-  const safePool = (() => {
-    let pool = isIR ? window.irFilterRecipes(window.RECIPES) : window.RECIPES;
-    pool = pool.filter(r => (r.protein || 0) >= perMeal);
-    return pool;
-  })();
+  // Pool meeting the protein floor (used for all fallback substitutions)
+  const proteinSafePool = window.RECIPES.filter(r => (r.protein || 0) >= perMeal);
+  // IR dinner pool: no starch + protein floor
+  const irDinnerPool = isIR
+    ? window.irFilterRecipes(window.RECIPES).filter(r => (r.protein || 0) >= perMeal)
+    : null;
 
-  function safeRecipe(id) {
-    const r = window.recipeById(id);
+  function safeRecipe(id, mealKey) {
+    const r       = window.recipeById(id);
     const starchy = window.STARCHY_IDS?.has(id);
     const tooLow  = (r?.protein || 0) < perMeal;
-    if (!starchy && !tooLow) return r;
-    // Substitute: prefer phase-appropriate safe recipe; fall back to any
-    return safePool.find(x => x.phases?.includes(phase.id)) || safePool[0] || r;
+    // For IR, only block starchy at dinner; breakfast & lunch are fine
+    const irBlock = isIR && starchy && mealKey === 'dinner';
+    if (!irBlock && !tooLow) return r;
+    // Pick substitution pool: IR dinner or general protein pool
+    const pool = irBlock ? irDinnerPool : proteinSafePool;
+    return pool?.find(x => x.phases?.includes(phase.id)) || pool?.[0] || r;
   }
 
   const mealsList = profile.meals === 2
     ? [
-        { key: 'lunch',  label: 'Lunch',  time: '12:30', r: safeRecipe(plan.lunch) },
-        { key: 'dinner', label: 'Dinner', time: '18:30', r: safeRecipe(plan.dinner) },
+        { key: 'lunch',  label: 'Lunch',  time: '12:30', r: safeRecipe(plan.lunch,  'lunch') },
+        { key: 'dinner', label: 'Dinner', time: '18:30', r: safeRecipe(plan.dinner, 'dinner') },
       ]
     : [
-        { key: 'breakfast', label: 'Breakfast', time: '08:00', r: safeRecipe(plan.breakfast) },
-        { key: 'lunch',     label: 'Lunch',     time: '13:00', r: safeRecipe(plan.lunch) },
-        { key: 'dinner',    label: 'Dinner',    time: '19:00', r: safeRecipe(plan.dinner) },
+        { key: 'breakfast', label: 'Breakfast', time: '08:00', r: safeRecipe(plan.breakfast, 'breakfast') },
+        { key: 'lunch',     label: 'Lunch',     time: '13:00', r: safeRecipe(plan.lunch,     'lunch') },
+        { key: 'dinner',    label: 'Dinner',    time: '19:00', r: safeRecipe(plan.dinner,    'dinner') },
       ];
 
   const stage     = window.lifeStageFor(profile.age);

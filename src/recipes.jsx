@@ -131,7 +131,9 @@ function WeekSlotPicker({ slot, onSelect, onClose, isIR, perMeal }) {
   const [query, setQuery] = useState_R('');
   const inputRef = useRef_R(null);
   useEffect_R(() => { inputRef.current?.focus(); }, []);
-  let pool = isIR ? window.irFilterRecipes(window.RECIPES) : window.RECIPES;
+  // IR: starchy blocked only for dinner slot; breakfast/lunch unrestricted
+  const blockStarchy = isIR && slot.meal === 'dinner';
+  let pool = blockStarchy ? window.irFilterRecipes(window.RECIPES) : window.RECIPES;
   pool = pool.filter(r => (r.protein || 0) >= (perMeal || 0));
   const recipes = pool.filter(r =>
     !query || r.title.toLowerCase().includes(query.toLowerCase()) || (r.cuisine || '').toLowerCase().includes(query.toLowerCase())
@@ -257,12 +259,10 @@ function RecipeBrowse({ profile, setProfile, openRecipe }) {
   const [condFilter, setCondFilter] = useState_R('all');
   const [planRecipe, setPlanRecipe] = useState_R(null); // recipe object for AddToPlanPicker
 
-  // Base pool: exclude high-starch (IR) and below-protein-target recipes
+  // Base pool: protein floor only (starch is filtered per-meal-slot for IR)
   const baseRecipes = useMemo_R(() => {
-    let pool = isIR ? window.irFilterRecipes(window.RECIPES) : window.RECIPES;
-    pool = pool.filter(r => (r.protein || 0) >= perMeal);
-    return pool;
-  }, [isIR, perMeal]);
+    return window.RECIPES.filter(r => (r.protein || 0) >= perMeal);
+  }, [perMeal]);
 
   const conditionTags = useMemo_R(() => {
     const conditions = profile.conditions || [];
@@ -274,7 +274,10 @@ function RecipeBrowse({ profile, setProfile, openRecipe }) {
   }, [profile.conditions]);
 
   const list = useMemo_R(() => {
+    // IR: starchy recipes blocked for dinner only; breakfast & lunch are unrestricted
+    const blockStarchy = isIR && meal === 'dinner';
     return baseRecipes.filter(r => {
+      if (blockStarchy && window.STARCHY_IDS?.has(r.id)) return false;
       if (filter === 'phase' && !r.phases.includes(phase.id)) return false;
       const meals = Array.isArray(r.meal) ? r.meal : [r.meal];
       if (meal !== 'all' && !meals.includes(meal)) return false;
@@ -284,7 +287,7 @@ function RecipeBrowse({ profile, setProfile, openRecipe }) {
       }
       return true;
     });
-  }, [baseRecipes, filter, meal, cuisine, condFilter, conditionTags, phase.id]);
+  }, [baseRecipes, isIR, filter, meal, cuisine, condFilter, conditionTags, phase.id]);
 
   return (
     <div style={{ maxWidth: 1180, margin: '0 auto', padding: '64px 32px 120px' }}>
@@ -298,7 +301,7 @@ function RecipeBrowse({ profile, setProfile, openRecipe }) {
       </div>
 
       <header style={{ marginBottom: isIR ? 24 : 56, paddingTop: 16, borderTop: '1px solid oklch(0.87 0.022 95)' }}>
-        <window.Eyebrow>Recipe library · {list.length} of {baseRecipes.length} · ≥{perMeal}g protein per meal{isIR ? ' · starchy hidden' : ''}</window.Eyebrow>
+        <window.Eyebrow>Recipe library · {list.length} of {baseRecipes.length} · ≥{perMeal}g protein per meal{isIR && meal === 'dinner' ? ' · low-carb dinner' : ''}</window.Eyebrow>
         <h1 style={{ fontFamily: 'Instrument Serif, serif', fontSize: 72, lineHeight: 0.98, color: 'oklch(0.28 0.040 145)', margin: '18px 0 0', fontWeight: 400 }}>
           <em>Real</em> recipes, from real kitchens.
         </h1>
@@ -309,7 +312,7 @@ function RecipeBrowse({ profile, setProfile, openRecipe }) {
         <div style={{ marginBottom: 40, padding: '14px 18px', borderRadius: 12, background: 'oklch(0.96 0.030 55)', border: '1px solid oklch(0.88 0.06 55)', display: 'flex', alignItems: 'center', gap: 12 }}>
           <span style={{ fontSize: 16 }}>◈</span>
           <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 13, lineHeight: 1.5, color: 'oklch(0.36 0.07 50)', margin: 0 }}>
-            <strong>Insulin Resistance mode on</strong> — recipes containing lentils, chickpeas, beans, rice, noodles, oats and other high-starch ingredients are hidden. To see all recipes, remove Insulin Resistance from your profile.
+            <strong>Insulin Resistance mode on</strong> — starchy ingredients (lentils, chickpeas, beans, rice, noodles, oats) are only restricted for <strong>dinner</strong>. Breakfast and lunch remain unrestricted so you can eat carbs earlier in the day when insulin sensitivity is higher.
           </p>
         </div>
       )}
