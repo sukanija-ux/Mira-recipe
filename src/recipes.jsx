@@ -127,11 +127,12 @@ function AddToPlanPicker({ recipe, profile, setProfile, onClose }) {
 
 // ── Week planner (slot picker uses existing RecipePicker-style inline search) ──
 
-function WeekSlotPicker({ slot, onSelect, onClose }) {
+function WeekSlotPicker({ slot, onSelect, onClose, isIR }) {
   const [query, setQuery] = useState_R('');
   const inputRef = useRef_R(null);
   useEffect_R(() => { inputRef.current?.focus(); }, []);
-  const recipes = window.RECIPES.filter(r =>
+  const pool = isIR ? window.irFilterRecipes(window.RECIPES) : window.RECIPES;
+  const recipes = pool.filter(r =>
     !query || r.title.toLowerCase().includes(query.toLowerCase()) || (r.cuisine || '').toLowerCase().includes(query.toLowerCase())
   );
   return (
@@ -168,6 +169,7 @@ function WeekSlotPicker({ slot, onSelect, onClose }) {
 }
 
 function WeekPlanner({ profile, setProfile, phase }) {
+  const isIR      = (profile.conditions || []).includes('insulin-resistance');
   const today     = new Date(); today.setHours(0,0,0,0);
   const todayKey  = dateKeyR(today);
   const days      = Array.from({ length: 7 }, (_, i) => addDaysR(today, i));
@@ -233,6 +235,7 @@ function WeekPlanner({ profile, setProfile, phase }) {
           slot={picker}
           onSelect={id => { setMeal(picker.dateKey, picker.meal, id); setPicker(null); }}
           onClose={() => setPicker(null)}
+          isIR={isIR}
         />
       )}
     </>
@@ -243,11 +246,17 @@ function WeekPlanner({ profile, setProfile, phase }) {
 
 function RecipeBrowse({ profile, setProfile, openRecipe }) {
   const phase   = window.phaseForDay(profile.day, profile.length);
+  const isIR    = (profile.conditions || []).includes('insulin-resistance');
   const [filter,     setFilter]     = useState_R('phase');
   const [meal,       setMeal]       = useState_R('all');
   const [cuisine,    setCuisine]    = useState_R('all');
   const [condFilter, setCondFilter] = useState_R('all');
   const [planRecipe, setPlanRecipe] = useState_R(null); // recipe object for AddToPlanPicker
+
+  // Base pool: exclude high-starch recipes for IR users
+  const baseRecipes = useMemo_R(() => {
+    return isIR ? window.irFilterRecipes(window.RECIPES) : window.RECIPES;
+  }, [isIR]);
 
   const conditionTags = useMemo_R(() => {
     const conditions = profile.conditions || [];
@@ -259,7 +268,7 @@ function RecipeBrowse({ profile, setProfile, openRecipe }) {
   }, [profile.conditions]);
 
   const list = useMemo_R(() => {
-    return window.RECIPES.filter(r => {
+    return baseRecipes.filter(r => {
       if (filter === 'phase' && !r.phases.includes(phase.id)) return false;
       const meals = Array.isArray(r.meal) ? r.meal : [r.meal];
       if (meal !== 'all' && !meals.includes(meal)) return false;
@@ -269,7 +278,7 @@ function RecipeBrowse({ profile, setProfile, openRecipe }) {
       }
       return true;
     });
-  }, [filter, meal, cuisine, condFilter, conditionTags, phase.id]);
+  }, [baseRecipes, filter, meal, cuisine, condFilter, conditionTags, phase.id]);
 
   return (
     <div style={{ maxWidth: 1180, margin: '0 auto', padding: '64px 32px 120px' }}>
@@ -282,12 +291,22 @@ function RecipeBrowse({ profile, setProfile, openRecipe }) {
         </div>
       </div>
 
-      <header style={{ marginBottom: 56, paddingTop: 16, borderTop: '1px solid oklch(0.87 0.022 95)' }}>
-        <window.Eyebrow>Recipe library · {list.length} of {window.RECIPES.length}</window.Eyebrow>
+      <header style={{ marginBottom: isIR ? 24 : 56, paddingTop: 16, borderTop: '1px solid oklch(0.87 0.022 95)' }}>
+        <window.Eyebrow>Recipe library · {list.length} of {baseRecipes.length}{isIR ? ' · starchy recipes hidden' : ''}</window.Eyebrow>
         <h1 style={{ fontFamily: 'Instrument Serif, serif', fontSize: 72, lineHeight: 0.98, color: 'oklch(0.28 0.040 145)', margin: '18px 0 0', fontWeight: 400 }}>
           <em>Real</em> recipes, from real kitchens.
         </h1>
       </header>
+
+      {/* IR notice */}
+      {isIR && (
+        <div style={{ marginBottom: 40, padding: '14px 18px', borderRadius: 12, background: 'oklch(0.96 0.030 55)', border: '1px solid oklch(0.88 0.06 55)', display: 'flex', alignItems: 'center', gap: 12 }}>
+          <span style={{ fontSize: 16 }}>◈</span>
+          <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 13, lineHeight: 1.5, color: 'oklch(0.36 0.07 50)', margin: 0 }}>
+            <strong>Insulin Resistance mode on</strong> — recipes containing lentils, chickpeas, beans, rice, noodles, oats and other high-starch ingredients are hidden. To see all recipes, remove Insulin Resistance from your profile.
+          </p>
+        </div>
+      )}
 
       {/* Filter rows */}
       <div style={{ marginBottom: 40, paddingBottom: 18, borderBottom: '1px solid oklch(0.86 0.025 95)' }}>

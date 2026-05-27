@@ -7,16 +7,27 @@ function Dashboard({ profile, setProfile, go, openRecipe }) {
   const plan  = window.PLAN_BY_PHASE[phase.id];
   const proteinTarget = Math.round((profile.height - 100) * 1.5);
   const perMeal       = Math.round(proteinTarget / profile.meals);
+  const isIR          = (profile.conditions || []).includes('insulin-resistance');
+
+  // For IR users: if the phase plan picks a starchy recipe, replace with the
+  // first IR-safe recipe that is appropriate for this phase (or globally safe).
+  const irSafePool = isIR ? window.irFilterRecipes(window.RECIPES) : null;
+  function safeRecipe(id) {
+    const r = window.recipeById(id);
+    if (!isIR || !window.STARCHY_IDS?.has(id)) return r;
+    // Prefer phase-appropriate; fall back to any safe recipe
+    return irSafePool?.find(x => x.phases?.includes(phase.id)) || irSafePool?.[0] || r;
+  }
 
   const mealsList = profile.meals === 2
     ? [
-        { key: 'lunch',  label: 'Lunch',  time: '12:30', r: window.recipeById(plan.lunch) },
-        { key: 'dinner', label: 'Dinner', time: '18:30', r: window.recipeById(plan.dinner) },
+        { key: 'lunch',  label: 'Lunch',  time: '12:30', r: safeRecipe(plan.lunch) },
+        { key: 'dinner', label: 'Dinner', time: '18:30', r: safeRecipe(plan.dinner) },
       ]
     : [
-        { key: 'breakfast', label: 'Breakfast', time: '08:00', r: window.recipeById(plan.breakfast) },
-        { key: 'lunch',     label: 'Lunch',     time: '13:00', r: window.recipeById(plan.lunch) },
-        { key: 'dinner',    label: 'Dinner',    time: '19:00', r: window.recipeById(plan.dinner) },
+        { key: 'breakfast', label: 'Breakfast', time: '08:00', r: safeRecipe(plan.breakfast) },
+        { key: 'lunch',     label: 'Lunch',     time: '13:00', r: safeRecipe(plan.lunch) },
+        { key: 'dinner',    label: 'Dinner',    time: '19:00', r: safeRecipe(plan.dinner) },
       ];
 
   const stage     = window.lifeStageFor(profile.age);

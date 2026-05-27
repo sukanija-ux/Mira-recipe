@@ -4105,6 +4105,36 @@ const TAG_STYLES = {
 
 const tagStyle = (tag) => TAG_STYLES[tag] || { bg: 'oklch(0.93 0.022 90)', fg: 'oklch(0.34 0.035 140)', bd: 'oklch(0.84 0.025 95)' };
 
+// ─── Insulin-Resistance: starchy recipe IDs ──────────────────────────────────
+// Recipes containing high-GI starchy ingredients: legumes (lentils, chickpeas,
+// beans), grains (rice, oats, noodles, pasta, rye bread, soba, quinoa, bulgur),
+// and starchy veg (potato, sweet potato, corn).
+const STARCHY_IDS = new Set([
+  // Legumes
+  'r-warming-mung-dal','r-folli-bowl','r-red-lentil-soup','r-falafel-plate',
+  'r-chickpea-stew','r-chickpea-shakshuka','r-red-lentil-dal-ks',
+  'r-sweet-potato-lentil-curry','r-salmon-beluga-lentils','r-moroccan-lentils',
+  'r-chana-masala','r-west-african-peanut-stew','r-coconut-red-curry-chickpeas',
+  'r-spiced-lentils-carrots','r-black-bean-soup','r-best-lentil-soup',
+  'r-golden-lentils-coconut','r-misir-wat','r-turkish-lentil-soup',
+  'r-lentil-tabbouleh','r-fatteh-chickpeas','r-sri-lankan-dhal','r-shiro-wat',
+  'r-cazuela-lentil','r-cuban-black-bean-soup','r-moroccan-red-lentil-soup',
+  'r-moroccan-harira','r-greek-chickpea-patties','r-feijoada','r-akara-fritters',
+  // Grains & noodles
+  'r-golden-oats','r-salmon-rye-board','r-soba-miso-broccoli','r-sopa-de-quinoa',
+  'r-jollof-rice-chicken','r-congee-ginger-egg','r-dan-dan-noodles',
+  'r-pad-see-ew-tofu','r-biber-dolma','r-linsen-spaetzle','r-bun-bo-hue',
+  'r-banh-mi-bowl','r-bibimbap','r-chicken-burrito-bowl','r-japchae','r-kisir',
+  'r-kimchi-jjigae','r-spanakopita',
+  // Starchy veg (potato, sweet potato, corn)
+  'r-caldo-de-pollo',
+]);
+
+/** Returns only IR-safe recipes (excludes high-starch ingredients). */
+function irFilterRecipes(recipes) {
+  return recipes.filter(r => !STARCHY_IDS.has(r.id));
+}
+
 // ─── Health Conditions ────────────────────────────────────────────────────────
 const HEALTH_CONDITIONS = [
   {
@@ -4185,4 +4215,5 @@ Object.assign(window, {
   TAG_STYLES, tagStyle, CARD_TAGS,
   RECIPE_CUISINE_FILTERS,
   HEALTH_CONDITIONS,
+  STARCHY_IDS, irFilterRecipes,
 });
