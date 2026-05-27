@@ -133,8 +133,7 @@ function WeekSlotPicker({ slot, onSelect, onClose, isIR, perMeal }) {
   useEffect_R(() => { inputRef.current?.focus(); }, []);
   // IR: starchy blocked only for dinner slot; breakfast/lunch unrestricted
   const blockStarchy = isIR && slot.meal === 'dinner';
-  let pool = blockStarchy ? window.irFilterRecipes(window.RECIPES) : window.RECIPES;
-  pool = pool.filter(r => (r.protein || 0) >= (perMeal || 0));
+  const pool = blockStarchy ? window.irFilterRecipes(window.RECIPES) : window.RECIPES;
   const recipes = pool.filter(r =>
     !query || r.title.toLowerCase().includes(query.toLowerCase()) || (r.cuisine || '').toLowerCase().includes(query.toLowerCase())
   );
@@ -259,10 +258,8 @@ function RecipeBrowse({ profile, setProfile, openRecipe }) {
   const [condFilter, setCondFilter] = useState_R('all');
   const [planRecipe, setPlanRecipe] = useState_R(null); // recipe object for AddToPlanPicker
 
-  // Base pool: protein floor only (starch is filtered per-meal-slot for IR)
-  const baseRecipes = useMemo_R(() => {
-    return window.RECIPES.filter(r => (r.protein || 0) >= perMeal);
-  }, [perMeal]);
+  // Base pool: all recipes (protein target shown on cards as a guide, not a hard gate)
+  const baseRecipes = window.RECIPES;
 
   const conditionTags = useMemo_R(() => {
     const conditions = profile.conditions || [];
@@ -301,7 +298,7 @@ function RecipeBrowse({ profile, setProfile, openRecipe }) {
       </div>
 
       <header style={{ marginBottom: isIR ? 24 : 56, paddingTop: 16, borderTop: '1px solid oklch(0.87 0.022 95)' }}>
-        <window.Eyebrow>Recipe library · {list.length} of {baseRecipes.length} · ≥{perMeal}g protein per meal{isIR && meal === 'dinner' ? ' · low-carb dinner' : ''}</window.Eyebrow>
+        <window.Eyebrow>Recipe library · {list.length} of {window.RECIPES.length}{isIR && meal === 'dinner' ? ' · low-carb dinner' : ''}</window.Eyebrow>
         <h1 style={{ fontFamily: 'Instrument Serif, serif', fontSize: 72, lineHeight: 0.98, color: 'oklch(0.28 0.040 145)', margin: '18px 0 0', fontWeight: 400 }}>
           <em>Real</em> recipes, from real kitchens.
         </h1>

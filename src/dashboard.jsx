@@ -9,23 +9,16 @@ function Dashboard({ profile, setProfile, go, openRecipe }) {
   const perMeal       = Math.round(proteinTarget / profile.meals);
   const isIR          = (profile.conditions || []).includes('insulin-resistance');
 
-  // Pool meeting the protein floor (used for all fallback substitutions)
-  const proteinSafePool = window.RECIPES.filter(r => (r.protein || 0) >= perMeal);
-  // IR dinner pool: no starch + protein floor
-  const irDinnerPool = isIR
-    ? window.irFilterRecipes(window.RECIPES).filter(r => (r.protein || 0) >= perMeal)
-    : null;
+  // IR dinner pool: no starch (protein shown on card but not used as a hard gate)
+  const irDinnerPool = isIR ? window.irFilterRecipes(window.RECIPES) : null;
 
   function safeRecipe(id, mealKey) {
-    const r       = window.recipeById(id);
-    const starchy = window.STARCHY_IDS?.has(id);
-    const tooLow  = (r?.protein || 0) < perMeal;
-    // For IR, only block starchy at dinner; breakfast & lunch are fine
-    const irBlock = isIR && starchy && mealKey === 'dinner';
-    if (!irBlock && !tooLow) return r;
-    // Pick substitution pool: IR dinner or general protein pool
-    const pool = irBlock ? irDinnerPool : proteinSafePool;
-    return pool?.find(x => x.phases?.includes(phase.id)) || pool?.[0] || r;
+    const r = window.recipeById(id);
+    // IR: only block starchy at dinner; breakfast & lunch are unrestricted
+    if (isIR && window.STARCHY_IDS?.has(id) && mealKey === 'dinner') {
+      return irDinnerPool?.find(x => x.phases?.includes(phase.id)) || irDinnerPool?.[0] || r;
+    }
+    return r;
   }
 
   const mealsList = profile.meals === 2
